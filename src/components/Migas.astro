@@ -1,0 +1,89 @@
+---
+import Icono from './Icono.astro';
+
+interface Props {
+  ruta: { nombre: string; href: string }[];
+  /** 'clara' sobre fondo blanco, 'oscura' sobre fondo verde */
+  variante?: 'clara' | 'oscura';
+}
+
+const { ruta, variante = 'clara' } = Astro.props;
+---
+
+<nav class:list={['migas', `migas--${variante}`]} aria-label="Ruta de navegación">
+  <ol>
+    {
+      ruta.map((paso, i) => {
+        const ultimo = i === ruta.length - 1;
+        return (
+          <li>
+            {i === 0 ? (
+              <a href={paso.href} aria-label="Inicio">
+                <Icono nombre="casa" tamano={16} trazo={2.2} />
+              </a>
+            ) : ultimo ? (
+              <span aria-current="page">{paso.nombre}</span>
+            ) : (
+              <a href={paso.href}>{paso.nombre}</a>
+            )}
+            {!ultimo && <span class="migas__sep" aria-hidden="true">/</span>}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
+
+<style>
+  .migas ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--condensada);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .migas li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .migas a {
+    display: inline-flex;
+    align-items: center;
+    color: var(--gris-medio);
+    transition: color var(--transicion);
+  }
+
+  .migas a:hover {
+    color: var(--verde);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .migas span[aria-current] {
+    color: var(--tinta);
+  }
+
+  .migas__sep {
+    color: var(--gris-borde);
+  }
+
+  .migas--oscura a,
+  .migas--oscura .migas__sep {
+    color: rgb(255 255 255 / 65%);
+  }
+
+  .migas--oscura span[aria-current] {
+    color: var(--blanco);
+  }
+
+  .migas--oscura a:hover {
+    color: var(--blanco);
+  }
+</style>

@@ -1,0 +1,439 @@
+---
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  BLOQUE B2B — CAPTACIÓN DE DISTRIBUIDORES
+ * ─────────────────────────────────────────────────────────────
+ *
+ *  Este es el bloque que justifica la pauta. Todo lo demás del
+ *  sitio es marca; esto es el objetivo comercial.
+ *
+ *  Decisión de copy: el titular NO dice "buscamos distribuidores".
+ *  Nadie hace clic en la necesidad ajena. Dice qué gana el
+ *  distribuidor y qué capacidad hay detrás para respaldarlo, que
+ *  es lo que un comprador mayorista realmente evalúa.
+ *
+ *  El CTA principal es WhatsApp y no el formulario porque en
+ *  Venezuela el canal comercial B2B se mueve por ahí. El
+ *  formulario queda de respaldo para quien escribe fuera de hora.
+ */
+import Icono from './Icono.astro';
+import { CONTACTO, FORMULARIO, SITE } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+const wa = enlaceWhatsApp('distribuidor');
+const hayFormulario = Boolean(FORMULARIO.claveAcceso);
+const hayCorreo = !CONTACTO.emailVentas.includes('REEMPLAZAR');
+
+const ventajas = [
+  {
+    titulo: 'Siete referencias, un solo proveedor',
+    texto:
+      'Ketchup, mayonesa, mostaza, salsa de ajo, inglesa, soya y vinagre. Un pedido, una factura, un despacho.',
+  },
+  {
+    titulo: 'Producción nacional',
+    texto: `Fabricamos en ${SITE.ciudad}, estado ${SITE.estado}. Sin costos de importación ni esperas de aduana en el medio.`,
+  },
+  {
+    titulo: 'Empresa formal',
+    texto: `${SITE.nombreLegal}, RIF ${SITE.rif}. Facturamos con todos los soportes que tu contabilidad necesita.`,
+  },
+  {
+    titulo: 'Margen para el canal',
+    texto:
+      'Lista de precios escalonada por volumen. Mientras más mueves, mejor entras.',
+  },
+];
+---
+
+<section class="distri" id="distribuidores" aria-labelledby="distri-titulo">
+  <div class="contenedor distri__grid">
+    <div class="distri__texto">
+      <p class="distri__antetitulo">Para mayoristas y distribuidores</p>
+
+      <h2 id="distri-titulo" class="distri__titulo">
+        Lleva Foodie a tu<br />zona de venta
+      </h2>
+
+      <p class="distri__intro">
+        Tenemos capacidad instalada disponible y buscamos distribuidores
+        que quieran mover la marca en su región. Si manejas abastos,
+        supermercados, restaurantes o food service, hablemos de números.
+      </p>
+
+      <ul class="distri__ventajas">
+        {
+          ventajas.map((v) => (
+            <li class="distri__ventaja">
+              <span class="distri__check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m5 13 4.5 4.5L19 7" />
+                </svg>
+              </span>
+              <div>
+                <h3 class="distri__ventaja-titulo">{v.titulo}</h3>
+                <p class="distri__ventaja-texto">{v.texto}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="distri__acciones">
+        <a
+          class="btn btn--wa distri__cta"
+          href={wa}
+          data-wa="distribuidor"
+          data-wa-etiqueta="Bloque distribuidores"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Icono nombre="whatsapp" tamano={22} />
+          Pedir lista de precios por WhatsApp
+        </a>
+
+        {
+          hayCorreo && (
+            <a class="distri__correo" href={`mailto:${CONTACTO.emailVentas}?subject=${encodeURIComponent('Interés como distribuidor Foodie')}`}>
+              o escríbenos a {CONTACTO.emailVentas}
+            </a>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      hayFormulario && (
+        <div class="distri__panel">
+          <h3 class="distri__panel-titulo">Déjanos tus datos</h3>
+          <p class="distri__panel-sub">Te contactamos en menos de 24 horas hábiles.</p>
+
+          <form class="formulario" method="POST" action={FORMULARIO.endpoint}>
+            <input type="hidden" name="access_key" value={FORMULARIO.claveAcceso} />
+            <input type="hidden" name="subject" value="Nuevo distribuidor interesado — corpasofino.com" />
+            <input type="hidden" name="from_name" value="Sitio web Foodie" />
+            {/* Trampa antispam: los bots la llenan, las personas no la ven. */}
+            <input type="checkbox" name="botcheck" class="solo-lectores" tabindex="-1" autocomplete="off" />
+            {/* Se rellena por JS con los UTM de la campaña. */}
+            <input type="hidden" name="origen_campana" id="origen-campana" value="" />
+
+            <div class="campo">
+              <label for="f-nombre">Nombre y apellido</label>
+              <input id="f-nombre" name="nombre" type="text" required autocomplete="name" />
+            </div>
+
+            <div class="campo">
+              <label for="f-empresa">Empresa o comercio</label>
+              <input id="f-empresa" name="empresa" type="text" required autocomplete="organization" />
+            </div>
+
+            <div class="campo">
+              <label for="f-ciudad">Ciudad y estado</label>
+              <input id="f-ciudad" name="ciudad" type="text" required />
+            </div>
+
+            <div class="campo">
+              <label for="f-telefono">Teléfono / WhatsApp</label>
+              <input id="f-telefono" name="telefono" type="tel" required autocomplete="tel" inputmode="tel" />
+            </div>
+
+            <div class="campo">
+              <label for="f-canal">¿Qué canal manejas?</label>
+              <select id="f-canal" name="canal" required>
+                <option value="">Selecciona una opción</option>
+                <option>Abastos y bodegas</option>
+                <option>Supermercados</option>
+                <option>Restaurantes / food service</option>
+                <option>Distribuidor mayorista</option>
+                <option>Otro</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="f-mensaje">Cuéntanos qué necesitas <span>(opcional)</span></label>
+              <textarea id="f-mensaje" name="mensaje" rows="3" />
+            </div>
+
+            <button type="submit" class="btn btn--verde formulario__enviar">
+              Enviar solicitud
+            </button>
+
+            <p class="formulario__estado" role="status" aria-live="polite" />
+          </form>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* Fondo casi negro a propósito: el resto del sitio le habla al
+     consumidor y este bloque le habla a un comprador mayorista.
+     El cambio de registro visual ayuda a que no se lea como
+     "más de lo mismo" y hace que el ámbar del CTA resalte. */
+  .distri {
+    background: var(--tinta);
+    color: var(--blanco);
+    padding-block: var(--seccion);
+  }
+
+  .distri__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  /* Cuando no hay formulario, el texto ocupa el ancho de lectura cómodo. */
+  .distri__grid:has(> :only-child) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .distri__grid:has(> :only-child) .distri__ventajas {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .distri__antetitulo {
+    font-family: var(--condensada);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    margin-bottom: 1rem;
+  }
+
+  .distri__titulo {
+    font-size: var(--t-xl);
+    color: var(--blanco);
+  }
+
+  .distri__intro {
+    max-width: 54ch;
+    margin-top: 1.25rem;
+    font-size: var(--t-md);
+    line-height: 1.65;
+    opacity: 0.92;
+  }
+
+  .distri__ventajas {
+    display: grid;
+    gap: 1.25rem 2rem;
+    margin-top: clamp(2rem, 4vw, 2.75rem);
+  }
+
+  .distri__ventaja {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .distri__check {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin-top: 2px;
+    color: var(--tinta);
+    background: var(--ambar);
+    border-radius: 50%;
+  }
+
+  .distri__ventaja-titulo {
+    font-family: var(--condensada);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--blanco);
+  }
+
+  .distri__ventaja-texto {
+    margin-top: 0.2rem;
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    opacity: 0.85;
+  }
+
+  .distri__acciones {
+    margin-top: clamp(2rem, 4vw, 2.75rem);
+  }
+
+  .distri__cta {
+    font-size: var(--t-md);
+  }
+
+  .distri__correo {
+    display: block;
+    margin-top: 1rem;
+    font-size: var(--t-sm);
+    opacity: 0.85;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .distri__correo:hover {
+    opacity: 1;
+  }
+
+  /* ── Panel del formulario ───────────────────────────────── */
+  .distri__panel {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--blanco);
+    color: var(--tinta);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-alta);
+  }
+
+  .distri__panel-titulo {
+    font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+    color: var(--verde-titulo);
+  }
+
+  .distri__panel-sub {
+    margin-top: 0.4rem;
+    font-size: var(--t-sm);
+    color: var(--gris-medio);
+  }
+
+  .formulario {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+  }
+
+  .campo {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .campo label {
+    font-family: var(--condensada);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gris-fuerte);
+  }
+
+  .campo label span {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--gris-suave);
+  }
+
+  .campo input,
+  .campo select,
+  .campo textarea {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    font-size: var(--t-sm);
+    background: var(--gris-fondo);
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    transition: border-color var(--transicion);
+  }
+
+  .campo input:focus,
+  .campo select:focus,
+  .campo textarea:focus {
+    border-color: var(--verde);
+    outline: none;
+    background: var(--blanco);
+  }
+
+  .campo textarea {
+    resize: vertical;
+    font-family: var(--texto);
+  }
+
+  .formulario__enviar {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+
+  .formulario__estado {
+    min-height: 1.2em;
+    font-size: var(--t-sm);
+    text-align: center;
+  }
+
+  .formulario__estado[data-estado='ok'] {
+    color: var(--verde-titulo);
+    font-weight: 600;
+  }
+
+  .formulario__estado[data-estado='error'] {
+    color: #c0392b;
+  }
+
+  @media (max-width: 900px) {
+    .distri__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .distri__ventajas {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('.formulario');
+  if (form) {
+    const estado = form.querySelector<HTMLParagraphElement>('.formulario__estado');
+    const boton = form.querySelector<HTMLButtonElement>('.formulario__enviar');
+
+    // Adjunta la campaña de origen al lead, para saber qué anuncio lo trajo.
+    const campo = form.querySelector<HTMLInputElement>('#origen-campana');
+    if (campo) {
+      try {
+        campo.value = sessionStorage.getItem('pf_atribucion') || 'directo';
+      } catch {
+        campo.value = 'no disponible';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!estado || !boton) return;
+
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      estado.removeAttribute('data-estado');
+      estado.textContent = '';
+
+      try {
+        const respuesta = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+
+        if (respuesta.ok) {
+          form.reset();
+          estado.dataset.estado = 'ok';
+          estado.textContent = '¡Listo! Te contactamos pronto.';
+
+          // Conversión: mismo evento que el WhatsApp de distribuidores,
+          // para que Meta optimice hacia ambos caminos por igual.
+          const w = window as any;
+          if (typeof w.fbq === 'function') {
+            w.fbq('track', 'Lead', { content_name: 'Formulario distribuidores' });
+          }
+          w.dataLayer = w.dataLayer || [];
+          w.dataLayer.push({ event: 'Lead', canal: 'formulario' });
+        } else {
+          throw new Error('respuesta no ok');
+        }
+      } catch {
+        estado.dataset.estado = 'error';
+        estado.textContent =
+          'No se pudo enviar. Escríbenos por WhatsApp y lo resolvemos.';
+      } finally {
+        boton.disabled = false;
+        boton.textContent = 'Enviar solicitud';
+      }
+    });
+  }
+</script>

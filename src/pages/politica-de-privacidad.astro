@@ -1,0 +1,249 @@
+---
+import Base from '../layouts/Base.astro';
+import Migas from '../components/Migas.astro';
+import { SITE, CONTACTO, TRACKING } from '../config/site.js';
+import { migas } from '../lib/schema.js';
+
+const ruta = [
+  { nombre: 'Inicio', href: '/' },
+  { nombre: 'Política de privacidad', href: '/politica-de-privacidad' },
+];
+
+const actualizado = new Date().toLocaleDateString('es-VE', {
+  year: 'numeric',
+  month: 'long',
+});
+
+const hayCorreo = !CONTACTO.email.includes('REEMPLAZAR');
+const usaPixel = Boolean(TRACKING.metaPixelId);
+const usaAnalitica = Boolean(TRACKING.gtmId || TRACKING.ga4Id);
+---
+
+<Base
+  titulo="Política de privacidad"
+  descripcion={`Cómo ${SITE.nombreLegal} recopila, usa y protege los datos de quienes visitan corpasofino.com.`}
+>
+  <section class="legal">
+    <div class="contenedor">
+      <Migas ruta={ruta} />
+
+      <div class="legal__cuerpo">
+        <h1>Política de privacidad</h1>
+        <p class="legal__fecha">Última actualización: {actualizado}</p>
+
+        <h2>Quiénes somos</h2>
+        <p>
+          Este sitio pertenece a {SITE.nombreLegal}, RIF {SITE.rif}, con
+          domicilio en {SITE.ciudad}, estado {SITE.estado}, Venezuela.
+          En adelante nos referimos a la empresa como «nosotros».
+        </p>
+
+        <h2>Qué datos recogemos</h2>
+        <p>Podemos recibir dos tipos de información:</p>
+        <ul>
+          <li>
+            <strong>Datos que nos entregas tú.</strong> Si nos escribes por
+            WhatsApp, por correo o a través del formulario de distribuidores,
+            recibimos los datos que decidas compartir: nombre, empresa,
+            ciudad, teléfono, correo y el contenido de tu mensaje.
+          </li>
+          <li>
+            <strong>Datos técnicos de navegación.</strong> Como cualquier
+            sitio web, nuestro servidor registra información básica de la
+            visita: dirección IP, tipo de navegador, dispositivo, páginas
+            vistas y desde qué enlace llegaste.
+          </li>
+        </ul>
+
+        <h2>Para qué los usamos</h2>
+        <ul>
+          <li>Responder tus consultas sobre productos o distribución.</li>
+          <li>Enviarte información comercial que tú nos hayas solicitado.</li>
+          <li>Entender qué contenido del sitio resulta útil y mejorarlo.</li>
+          {
+            usaPixel && (
+              <li>
+                Medir el resultado de nuestras campañas publicitarias y
+                mostrar anuncios a personas con intereses similares.
+              </li>
+            )
+          }
+        </ul>
+        <p>
+          No vendemos, alquilamos ni cedemos tus datos personales a terceros
+          con fines comerciales.
+        </p>
+
+        <h2>Cookies y tecnologías de medición</h2>
+        <p>
+          Usamos cookies y tecnologías equivalentes para que el sitio
+          funcione y para medir su uso.
+        </p>
+        {
+          (usaPixel || usaAnalitica) && (
+            <p>
+              Trabajamos con proveedores externos que instalan sus propias
+              cookies:
+            </p>
+          )
+        }
+        <ul>
+          {
+            usaPixel && (
+              <li>
+                <strong>Meta (Facebook e Instagram).</strong> El píxel de Meta
+                nos permite saber si un anuncio generó una visita o una
+                conversación, y construir audiencias publicitarias. Su
+                política está en{' '}
+                <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener noreferrer nofollow">
+                  facebook.com/privacy/policy
+                </a>
+                .
+              </li>
+            )
+          }
+          {
+            usaAnalitica && (
+              <li>
+                <strong>Google.</strong> Usamos Google Tag Manager y Google
+                Analytics para medir el tráfico del sitio de forma agregada.
+                Su política está en{' '}
+                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer nofollow">
+                  policies.google.com/privacy
+                </a>
+                .
+              </li>
+            )
+          }
+        </ul>
+        <p>
+          Puedes bloquear o borrar las cookies desde la configuración de tu
+          navegador. Si lo haces, el sitio sigue funcionando con normalidad.
+        </p>
+
+        <h2>WhatsApp</h2>
+        <p>
+          Los botones de contacto abren una conversación en WhatsApp, un
+          servicio de Meta Platforms. Al escribirnos por ese canal, la
+          conversación queda sujeta también a las condiciones de WhatsApp.
+          El mensaje que se precarga puede incluir una referencia corta al
+          anuncio o página desde donde llegaste, únicamente para saber qué
+          campaña originó el contacto.
+        </p>
+
+        <h2>Cuánto tiempo conservamos los datos</h2>
+        <p>
+          Conservamos los datos de contacto comercial mientras exista una
+          relación o un interés vigente, y los eliminamos cuando dejan de
+          ser necesarios o cuando nos lo solicitas.
+        </p>
+
+        <h2>Tus derechos</h2>
+        <p>
+          Puedes pedirnos en cualquier momento que te digamos qué datos
+          tuyos tenemos, que los corrijamos o que los eliminemos. Escríbenos
+          {
+            hayCorreo ? (
+              <>
+                {' '}a <a href={`mailto:${CONTACTO.email}`}>{CONTACTO.email}</a>
+              </>
+            ) : (
+              <> por los canales indicados en la página de contacto</>
+            )
+          }
+          {' '}y atenderemos la solicitud.
+        </p>
+
+        <h2>Menores de edad</h2>
+        <p>
+          Este sitio no está dirigido a menores de edad y no recogemos datos
+          de forma consciente de personas menores de 18 años.
+        </p>
+
+        <h2>Cambios en esta política</h2>
+        <p>
+          Si actualizamos esta política, publicaremos la nueva versión en
+          esta misma página con su fecha de actualización.
+        </p>
+
+        <h2>Contacto</h2>
+        <p>
+          {SITE.nombreLegal} · RIF {SITE.rif}<br />
+          {SITE.ciudad}, estado {SITE.estado}, Venezuela
+          {
+            hayCorreo && (
+              <>
+                <br />
+                <a href={`mailto:${CONTACTO.email}`}>{CONTACTO.email}</a>
+              </>
+            )
+          }
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .legal {
+    padding-block: clamp(1.5rem, 3vw, 2.5rem) var(--seccion);
+  }
+
+  .legal__cuerpo {
+    max-width: 72ch;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .legal h1 {
+    color: var(--verde-titulo);
+  }
+
+  .legal__fecha {
+    margin-top: 0.75rem;
+    font-family: var(--condensada);
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gris-suave);
+  }
+
+  .legal h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.2rem, 1rem + 0.8vw, 1.6rem);
+    color: var(--tinta);
+  }
+
+  .legal p,
+  .legal li {
+    font-size: var(--t-base);
+    line-height: 1.75;
+    color: var(--gris-medio);
+  }
+
+  .legal p + p {
+    margin-top: 1rem;
+  }
+
+  .legal ul {
+    display: grid;
+    gap: 0.85rem;
+    margin: 1rem 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .legal strong {
+    color: var(--tinta);
+  }
+
+  .legal a {
+    color: var(--verde-titulo);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .legal a:hover {
+    color: var(--tinta);
+  }
+</style>

@@ -1,0 +1,205 @@
+---
+import { Image } from 'astro:assets';
+import Icono from './Icono.astro';
+import logo from '../assets/brand/logo-pasofino.png';
+import { SITE, CONTACTO, REDES, NAV_FOOTER } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+const anio = new Date().getFullYear();
+const wa = enlaceWhatsApp('general');
+const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
+const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
+---
+
+<footer class="pie">
+  <div class="pie__interior contenedor">
+    <div class="pie__marca">
+      <Image
+        src={logo}
+        alt={SITE.nombreLegal}
+        widths={[240, 480]}
+        sizes="220px"
+        loading="lazy"
+      />
+      <p class="pie__rif">RIF.: {SITE.rif}</p>
+    </div>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Dónde estamos</h2>
+      <p class="pie__texto">
+        {SITE.ciudad}, estado {SITE.estado}<br />
+        Venezuela
+      </p>
+      <p class="pie__texto">{CONTACTO.horario}</p>
+    </div>
+
+    <nav class="pie__columna" aria-label="Navegación del pie de página">
+      <h2 class="pie__titulo solo-lectores">Secciones</h2>
+      <ul class="pie__enlaces">
+        {
+          NAV_FOOTER.map((item) => (
+            <li>
+              <a href={item.href}>{item.texto}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Síguenos</h2>
+      <div class="pie__redes">
+        {
+          tieneIg && (
+            <a
+              href={REDES.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram de Foodie"
+            >
+              <Icono nombre="instagram" tamano={26} />
+            </a>
+          )
+        }
+        {
+          tieneTt && (
+            <a
+              href={REDES.tiktok}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok de Foodie"
+            >
+              <Icono nombre="tiktok" tamano={26} />
+            </a>
+          )
+        }
+        <a
+          href={wa}
+          data-wa="general"
+          data-wa-etiqueta="Footer"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Escríbenos por WhatsApp"
+        >
+          <Icono nombre="whatsapp" tamano={26} />
+        </a>
+      </div>
+
+      <p class="pie__copy">
+        © {anio} {SITE.nombreLegal}<br />Todos los derechos reservados.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    background: var(--verde);
+    color: var(--blanco);
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .pie__interior {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .pie__marca :global(img) {
+    width: clamp(160px, 16vw, 220px);
+    height: auto;
+  }
+
+  .pie__rif {
+    margin-top: 0.5rem;
+    font-family: var(--condensada);
+    font-size: var(--t-sm);
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+  }
+
+  .pie__titulo {
+    font-family: var(--condensada);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .pie__texto {
+    font-size: var(--t-sm);
+    line-height: 1.7;
+    opacity: 0.9;
+    margin-bottom: 0.75rem;
+  }
+
+  .pie__enlaces {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .pie__enlaces a {
+    font-family: var(--condensada);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    transition: opacity var(--transicion);
+  }
+
+  .pie__enlaces a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .pie__redes {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .pie__redes a {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid rgb(255 255 255 / 55%);
+    border-radius: 50%;
+    transition:
+      background var(--transicion),
+      color var(--transicion),
+      border-color var(--transicion);
+  }
+
+  .pie__redes a:hover {
+    background: var(--blanco);
+    color: var(--verde);
+    border-color: var(--blanco);
+  }
+
+  .pie__copy {
+    margin-top: 2rem;
+    font-size: var(--t-xs);
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+
+  @media (max-width: 900px) {
+    .pie__interior {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .pie__interior {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+    }
+    .pie__copy {
+      margin-top: 1rem;
+    }
+  }
+</style>

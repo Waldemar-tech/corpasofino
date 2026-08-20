@@ -1,0 +1,23 @@
+{
+  "name": "corpasofino",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio web de Corporación Paso Fino C.A. — salsas y aderezos Foodie, hechos en Barquisimeto.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.1.1",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@fontsource-variable/dm-sans": "^5.1.0",
+    "@fontsource/anton": "^5.1.0",
+    "@fontsource/barlow-condensed": "^5.1.0"
+  }
+}

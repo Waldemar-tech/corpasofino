@@ -1,0 +1,351 @@
+---
+import { Image } from 'astro:assets';
+import Icono from './Icono.astro';
+import logo from '../assets/brand/logo-pasofino.png';
+import { NAV, REDES, SITE } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+const ruta = Astro.url.pathname.replace(/\/$/, '') || '/';
+const activo = (href: string) =>
+  href === '/' ? ruta === '/' : ruta.startsWith(href);
+
+const wa = enlaceWhatsApp('general');
+const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
+---
+
+<header class="cabecera">
+  <div class="cabecera__interior">
+    <a href="/" class="cabecera__logo" aria-label={`${SITE.nombreLegal} — inicio`}>
+      <Image
+        src={logo}
+        alt={SITE.nombreLegal}
+        widths={[220, 440]}
+        sizes="180px"
+        loading="eager"
+        densities={undefined}
+      />
+    </a>
+
+    <nav class="cabecera__nav" aria-label="Navegación principal">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['cabecera__enlace', { activo: activo(item.href) }]}
+                aria-current={activo(item.href) ? 'page' : undefined}
+              >
+                {item.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="cabecera__acciones">
+      <a href="/#distribuidores" class="cabecera__distribuidores">
+        ¿Eres distribuidor?
+      </a>
+
+      <div class="cabecera__redes">
+        {
+          tieneIg && (
+            <a
+              href={REDES.instagram}
+              class="cabecera__red"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram de Foodie"
+            >
+              <Icono nombre="instagram" tamano={20} />
+            </a>
+          )
+        }
+        <a
+          href={wa}
+          class="cabecera__red"
+          data-wa="general"
+          data-wa-etiqueta="Header"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Escríbenos por WhatsApp"
+        >
+          <Icono nombre="whatsapp" tamano={20} />
+        </a>
+      </div>
+
+      <button
+        class="cabecera__hamburguesa"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        aria-label="Abrir menú"
+      >
+        <Icono nombre="menu" tamano={26} />
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú móvil -->
+  <div class="movil" id="menu-movil" hidden>
+    <nav aria-label="Navegación móvil">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href}>{item.texto}</a>
+            </li>
+          ))
+        }
+        <li><a href="/contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <a href="/#distribuidores" class="btn btn--blanco movil__cta">
+      ¿Eres distribuidor?
+    </a>
+    <div class="movil__redes">
+      {
+        tieneIg && (
+          <a href={REDES.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <Icono nombre="instagram" tamano={24} />
+          </a>
+        )
+      }
+      <a
+        href={wa}
+        data-wa="general"
+        data-wa-etiqueta="Menú móvil"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp"
+      >
+        <Icono nombre="whatsapp" tamano={24} />
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .cabecera {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--verde);
+    color: var(--blanco);
+  }
+
+  .cabecera__interior {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 3rem);
+    width: 100%;
+    max-width: var(--ancho);
+    margin-inline: auto;
+    padding: 0.75rem var(--margen);
+    min-height: 84px;
+  }
+
+  .cabecera__logo {
+    flex-shrink: 0;
+    display: block;
+    width: clamp(120px, 12vw, 168px);
+  }
+
+  .cabecera__logo :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .cabecera__nav {
+    flex: 1;
+  }
+
+  .cabecera__nav ul {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 3.25rem);
+  }
+
+  .cabecera__enlace {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.35rem;
+    font-family: var(--condensada);
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    transition: opacity var(--transicion);
+  }
+
+  .cabecera__enlace::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transicion);
+  }
+
+  .cabecera__enlace:hover::after,
+  .cabecera__enlace.activo::after {
+    transform: scaleX(1);
+  }
+
+  .cabecera__enlace.activo {
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .cabecera__acciones {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    margin-left: auto;
+  }
+
+  .cabecera__distribuidores {
+    padding: 0.55rem 1.1rem;
+    font-family: var(--condensada);
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--verde);
+    background: var(--blanco);
+    border-radius: var(--radio-pill);
+    white-space: nowrap;
+    transition:
+      background var(--transicion),
+      color var(--transicion);
+  }
+
+  .cabecera__distribuidores:hover {
+    background: var(--ambar);
+    color: var(--tinta);
+  }
+
+  .cabecera__redes {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .cabecera__red {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgb(255 255 255 / 55%);
+    border-radius: 9px;
+    transition:
+      background var(--transicion),
+      border-color var(--transicion),
+      color var(--transicion);
+  }
+
+  .cabecera__red:hover {
+    background: var(--blanco);
+    border-color: var(--blanco);
+    color: var(--verde);
+  }
+
+  .cabecera__hamburguesa {
+    display: none;
+    color: var(--blanco);
+    padding: 0.25rem;
+  }
+
+  /* ── Menú móvil ─────────────────────────────────────────── */
+  .movil {
+    padding: 0 var(--margen) 2rem;
+    border-top: 1px solid rgb(255 255 255 / 20%);
+  }
+
+  .movil[hidden] {
+    display: none;
+  }
+
+  .movil ul {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .movil a {
+    display: block;
+    padding: 1rem 0;
+    font-family: var(--condensada);
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgb(255 255 255 / 15%);
+  }
+
+  .movil__cta {
+    width: 100%;
+    margin-top: 1.5rem;
+  }
+
+  .movil__redes {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+  }
+
+  .movil__redes a {
+    padding: 0;
+    border: none;
+  }
+
+  @media (max-width: 1024px) {
+    .cabecera__nav,
+    .cabecera__distribuidores {
+      display: none;
+    }
+    .cabecera__hamburguesa {
+      display: block;
+    }
+    .cabecera__interior {
+      min-height: 68px;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .movil {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const boton = document.querySelector<HTMLButtonElement>('.cabecera__hamburguesa');
+  const menu = document.getElementById('menu-movil');
+
+  if (boton && menu) {
+    boton.addEventListener('click', () => {
+      const abierto = boton.getAttribute('aria-expanded') === 'true';
+      boton.setAttribute('aria-expanded', String(!abierto));
+      boton.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+      menu.hidden = abierto;
+    });
+
+    // Cerrar al navegar a un ancla dentro de la misma página.
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) {
+        boton.setAttribute('aria-expanded', 'false');
+        menu.hidden = true;
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) {
+        boton.setAttribute('aria-expanded', 'false');
+        menu.hidden = true;
+        boton.focus();
+      }
+    });
+  }
+</script>

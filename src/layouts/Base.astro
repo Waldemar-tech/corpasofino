@@ -1,0 +1,142 @@
+---
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import Analytics from '../components/Analytics.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icono from '../components/Icono.astro';
+import { SITE, TRACKING } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+import { organizacion, sitioWeb } from '../lib/schema.js';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  imagen?: string;
+  imagenAlt?: string;
+  tipo?: 'website' | 'article' | 'product';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Oculta el botón flotante (p. ej. en la página de contacto) */
+  sinBotonFlotante?: boolean;
+}
+
+const {
+  titulo,
+  descripcion,
+  imagen,
+  imagenAlt,
+  tipo,
+  noindex,
+  jsonLd = [],
+  sinBotonFlotante = false,
+} = Astro.props;
+
+// La identidad de la empresa viaja en todas las páginas; lo específico
+// de cada página se le suma encima.
+const bloques = [
+  organizacion(),
+  sitioWeb(),
+  ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd]),
+];
+
+const wa = enlaceWhatsApp('general');
+---
+
+<!doctype html>
+<html lang={SITE.idioma}>
+  <head>
+    <Seo
+      titulo={titulo}
+      descripcion={descripcion}
+      imagen={imagen}
+      imagenAlt={imagenAlt}
+      tipo={tipo}
+      noindex={noindex}
+      jsonLd={bloques}
+    />
+    <Analytics />
+  </head>
+
+  <body>
+    {
+      TRACKING.gtmId && (
+        <noscript
+          is:inline
+          set:html={`<iframe src="https://www.googletagmanager.com/ns.html?id=${TRACKING.gtmId}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`}
+        />
+      )
+    }
+
+    <a href="#contenido" class="saltar">Saltar al contenido</a>
+
+    <Header />
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {
+      !sinBotonFlotante && (
+        <a
+          class="flotante"
+          href={wa}
+          data-wa="general"
+          data-wa-etiqueta="Botón flotante"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Escríbenos por WhatsApp"
+        >
+          <Icono nombre="whatsapp" tamano={28} />
+          <span class="flotante__texto">Escríbenos</span>
+        </a>
+      )
+    }
+
+    <script>
+      import '../scripts/tracking.js';
+    </script>
+
+    <style>
+      .flotante {
+        position: fixed;
+        right: clamp(1rem, 3vw, 2rem);
+        bottom: clamp(1rem, 3vw, 2rem);
+        z-index: 90;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.9rem 1.35rem;
+        background: #25d366;
+        color: #06331a;
+        border-radius: var(--radio-pill);
+        box-shadow: var(--sombra-alta);
+        font-family: var(--condensada);
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        transition:
+          transform var(--transicion),
+          background var(--transicion);
+      }
+
+      .flotante:hover {
+        transform: translateY(-3px);
+        background: #1fb855;
+        color: var(--blanco);
+      }
+
+      @media (max-width: 640px) {
+        .flotante__texto {
+          display: none;
+        }
+        .flotante {
+          padding: 0.95rem;
+        }
+      }
+    </style>
+  </body>
+</html>

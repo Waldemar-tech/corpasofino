@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+
+import Base from '../../layouts/Base.astro';
+import TarjetaProducto from '../../components/TarjetaProducto.astro';
+import Distribuidores from '../../components/Distribuidores.astro';
+import Migas from '../../components/Migas.astro';
+import letPonleSabor from '../../assets/lettering/ponle-sabor.png';
+
+import { migas } from '../../lib/schema.js';
+
+const productos = (await getCollection('productos')).sort(
+  (a, b) => a.data.orden - b.data.orden
+);
+
+const ruta = [
+  { nombre: 'Inicio', href: '/' },
+  { nombre: 'Productos', href: '/productos' },
+];
+---
+
+<Base
+  titulo="Productos"
+  descripcion="Catálogo Foodie: ketchup, mayonesa, mostaza, salsa de ajo, salsa inglesa, salsa de soya y vinagre. Salsas y aderezos fabricados en Barquisimeto por Corporación Paso Fino."
+  jsonLd={migas(ruta)}
+>
+  <section class="portada">
+    <div class="contenedor">
+      <Migas ruta={ruta} />
+      <div class="portada__cabeza">
+        <div>
+          <h1>Nuestros productos</h1>
+          <p class="portada__intro">
+            Siete referencias para cubrir la mesa completa: desde el
+            acompañante de todos los días hasta el ingrediente que le da
+            fondo a un guiso.
+          </p>
+        </div>
+        <Image
+          src={letPonleSabor}
+          alt=""
+          widths={[260, 480]}
+          sizes="(max-width: 720px) 52vw, 240px"
+          loading="lazy"
+          class="lettering portada__lettering"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="listado">
+    <div class="contenedor">
+      <ul class="rejilla">
+        {
+          productos.map((producto, i) => (
+            <li>
+              <TarjetaProducto producto={producto} prioridad={i < 4} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Distribuidores />
+</Base>
+
+<style>
+  .portada {
+    padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 4vw, 3rem);
+  }
+
+  .portada__cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .portada h1 {
+    color: var(--verde-titulo);
+  }
+
+  .portada__intro {
+    max-width: 56ch;
+    margin-top: 1rem;
+    font-size: var(--t-md);
+    color: var(--gris-medio);
+  }
+
+  .portada__lettering {
+    width: clamp(150px, 20vw, 240px);
+    height: auto;
+  }
+
+  .listado {
+    padding-bottom: var(--seccion);
+  }
+
+  .rejilla {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.75rem);
+  }
+
+  @media (min-width: 640px) {
+    .rejilla {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

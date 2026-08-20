@@ -1,0 +1,175 @@
+---
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import Migas from '../components/Migas.astro';
+import Distribuidores from '../components/Distribuidores.astro';
+
+import { SITE, CONTACTO, REDES } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+import { migas, negocioLocal } from '../lib/schema.js';
+
+const ruta = [
+  { nombre: 'Inicio', href: '/' },
+  { nombre: 'Contacto', href: '/contacto' },
+];
+
+const wa = enlaceWhatsApp('general');
+const hayCorreo = !CONTACTO.email.includes('REEMPLAZAR');
+const hayIg = !REDES.instagram.includes('REEMPLAZAR');
+---
+
+<Base
+  titulo="Contacto"
+  descripcion={`Contacta a ${SITE.nombreLegal} en ${SITE.ciudad}, estado ${SITE.estado}. Escríbenos por WhatsApp para consultas de productos, disponibilidad o distribución.`}
+  jsonLd={[migas(ruta), negocioLocal()]}
+  sinBotonFlotante={true}
+>
+  <section class="contacto">
+    <div class="contenedor">
+      <Migas ruta={ruta} />
+
+      <div class="contacto__grid">
+        <div>
+          <h1>Hablemos</h1>
+          <p class="contacto__intro">
+            Si eres consumidor y quieres saber dónde conseguir Foodie, o
+            tienes un negocio y te interesa venderlo, escríbenos. La vía
+            más rápida es WhatsApp.
+          </p>
+
+          <a
+            class="btn btn--wa contacto__cta"
+            href={wa}
+            data-wa="general"
+            data-wa-etiqueta="Página contacto"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Icono nombre="whatsapp" tamano={22} />
+            Escribir por WhatsApp
+          </a>
+        </div>
+
+        <ul class="datos">
+          <li>
+            <h2>WhatsApp</h2>
+            <a href={wa} data-wa="general" data-wa-etiqueta="Dato contacto" target="_blank" rel="noopener noreferrer">
+              {CONTACTO.telefonoVisible}
+            </a>
+          </li>
+
+          {
+            hayCorreo && (
+              <li>
+                <h2>Correo</h2>
+                <a href={`mailto:${CONTACTO.email}`}>{CONTACTO.email}</a>
+              </li>
+            )
+          }
+
+          <li>
+            <h2>Dónde estamos</h2>
+            <p>{SITE.ciudad}, estado {SITE.estado}<br />Venezuela</p>
+          </li>
+
+          <li>
+            <h2>Horario de atención</h2>
+            <p>{CONTACTO.horario}</p>
+          </li>
+
+          {
+            hayIg && (
+              <li>
+                <h2>Redes</h2>
+                <a href={REDES.instagram} target="_blank" rel="noopener noreferrer">
+                  Instagram
+                </a>
+              </li>
+            )
+          }
+
+          <li>
+            <h2>Datos fiscales</h2>
+            <p>{SITE.nombreLegal}<br />RIF {SITE.rif}</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <Distribuidores />
+</Base>
+
+<style>
+  .contacto {
+    padding-block: clamp(1.5rem, 3vw, 2.5rem) var(--seccion);
+  }
+
+  .contacto__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .contacto h1 {
+    color: var(--verde-titulo);
+  }
+
+  .contacto__intro {
+    max-width: 48ch;
+    margin-top: 1.25rem;
+    font-size: var(--t-md);
+    line-height: 1.7;
+    color: var(--gris-medio);
+  }
+
+  .contacto__cta {
+    margin-top: 2rem;
+    font-size: var(--t-md);
+  }
+
+  .datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 1.75rem 2rem;
+  }
+
+  .datos li {
+    padding-top: 1rem;
+    border-top: 2px solid var(--verde);
+  }
+
+  .datos h2 {
+    font-family: var(--condensada);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gris-suave);
+    margin-bottom: 0.4rem;
+  }
+
+  .datos a,
+  .datos p {
+    font-size: var(--t-base);
+    line-height: 1.55;
+    color: var(--tinta);
+  }
+
+  .datos a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .datos a:hover {
+    color: var(--verde);
+  }
+
+  @media (max-width: 820px) {
+    .contacto__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

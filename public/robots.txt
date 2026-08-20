@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Las URLs con parámetros de campaña son la misma página que la
+# canónica. Se bloquea el rastreo para no diluir señales de SEO.
+Disallow: /*?utm_
+Disallow: /*?fbclid=
+Disallow: /*?gclid=
+
+Sitemap: https://corpasofino.com/sitemap-index.xml
