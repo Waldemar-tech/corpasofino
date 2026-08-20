@@ -1,54 +1,52 @@
 {
-	# Railway inyecta PORT; en local usamos 8080
-	# Deshabilitar TLS porque Railway lo maneja en el proxy
-	http_port {$PORT:8080}
-	https_port -1
+	# Deshabilitar TLS: Railway maneja HTTPS en el proxy
 	auto_https off
 }
 
-:http {
-	root * /srv
+# Escuchar en el puerto inyectado por Railway (default 8080)
+:{$PORT:8080}
 
-	# Comprime todo lo que se pueda
-	encode zstd gzip
+root * /srv
 
-	# Cabeceras de seguridad
-	header {
-		X-Content-Type-Options "nosniff"
-		Referrer-Policy "strict-origin-when-cross-origin"
-		X-Frame-Options "SAMEORIGIN"
-		Strict-Transport-Security "max-age=31536000; includeSubDomains"
-		Permissions-Policy "geolocation=(), microphone=(), camera=()"
-		-Server
-	}
+# Comprime todo
+encode zstd gzip
 
-	# Archivos de /_astro/ (con hash en el nombre)
-	@astro path /_astro/*
-	handle @astro {
-		header Cache-Control "public, max-age=31536000, immutable"
+# Cabeceras de seguridad
+header {
+	X-Content-Type-Options "nosniff"
+	Referrer-Policy "strict-origin-when-cross-origin"
+	X-Frame-Options "SAMEORIGIN"
+	Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	Permissions-Policy "geolocation=(), microphone=(), camera=()"
+	-Server
+}
+
+# Assets de /_astro/ (con hash)
+@astro path /_astro/*
+handle @astro {
+	header Cache-Control "public, max-age=31536000, immutable"
+	file_server
+}
+
+# Assets estáticos
+@static path *.png *.jpg *.jpeg *.webp *.avif *.svg *.woff2 *.woff *.ico
+handle @static {
+	header Cache-Control "public, max-age=2592000"
+	file_server
+}
+
+# HTML con revalidación
+handle {
+	header Cache-Control "public, max-age=0, must-revalidate"
+	try_files {path} {path}.html {path}/index.html
+	file_server
+}
+
+# 404
+handle_errors {
+	@notfound expression {err.status_code} == 404
+	handle @notfound {
+		rewrite * /404.html
 		file_server
-	}
-
-	# Assets estáticos de /public
-	@static path *.png *.jpg *.jpeg *.webp *.avif *.svg *.woff2 *.woff *.ico
-	handle @static {
-		header Cache-Control "public, max-age=2592000"
-		file_server
-	}
-
-	# Todo lo demás: HTML con revalidación constante
-	handle {
-		header Cache-Control "public, max-age=0, must-revalidate"
-		try_files {path} {path}.html {path}/index.html
-		file_server
-	}
-
-	# 404 personalizado
-	handle_errors {
-		@notfound expression {err.status_code} == 404
-		handle @notfound {
-			rewrite * /404.html
-			file_server
-		}
 	}
 }
