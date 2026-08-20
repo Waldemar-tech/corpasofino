@@ -1,5 +1,7 @@
 # Railway define PORT en tiempo de ejecución. En local, 8080.
-0.0.0.0:{$PORT:8080}
+# Permitir HTTP (Railway hace proxy HTTPS → HTTP)
+http://0.0.0.0:{$PORT:8080}
+https://0.0.0.0:{$PORT:8080}
 
 root * /srv
 
