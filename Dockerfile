@@ -32,6 +32,7 @@ COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /app/dist /srv
 
 # Railway inyecta PORT en tiempo de ejecución; el Caddyfile lo lee.
-EXPOSE 8080
+# Exponer rango de puertos para compatibilidad
+EXPOSE 8080 80 443
 
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
