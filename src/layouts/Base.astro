@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Seo from '../components/Seo.astro';
 import Analytics from '../components/Analytics.astro';
 import Header from '../components/Header.astro';
+import BarraCorporativa from '../components/BarraCorporativa.astro';
 import Footer from '../components/Footer.astro';
 import HeaderCorporativo from '../components/HeaderCorporativo.astro';
 import FooterCorporativo from '../components/FooterCorporativo.astro';
@@ -85,8 +86,21 @@ const wa = enlaceWhatsApp('general');
     {/* Cada marca trae su propia cabecera. Las páginas corporativas
         usan la blanca de Paso Fino; dentro de una marca manda la suya.
         No es un capricho estético: es lo que hace que el visitante
-        sepa siempre en qué parte de la casa está parado. */}
-    {marca ? <Header marca={marca} /> : <HeaderCorporativo />}
+        sepa siempre en qué parte de la casa está parado.
+
+        Encima de la cabecera de marca va la franja corporativa, que
+        es el camino de vuelta a Paso Fino y el salto a la otra línea.
+        En las páginas corporativas sobra: ya estás en la casa. */}
+    {
+      marca ? (
+        <Fragment>
+          <BarraCorporativa marca={marca} />
+          <Header marca={marca} />
+        </Fragment>
+      ) : (
+        <HeaderCorporativo />
+      )
+    }
 
     <main id="contenido">
       <slot />

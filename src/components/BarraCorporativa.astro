@@ -1,0 +1,173 @@
+---
+import { Image } from 'astro:assets';
+import logoPasoFino from '../assets/brand/logo-pasofino-color.png';
+import { SITE } from '../config/site.js';
+import { listaMarcas } from '../config/marcas.js';
+
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  BARRA CORPORATIVA
+ * ─────────────────────────────────────────────────────────────
+ *  Franja fina de Paso Fino que va encima de la cabecera de cada
+ *  marca. Resuelve dos cosas a la vez:
+ *
+ *  1. La vuelta a la corporación. Antes el logotipo de la cabecera
+ *     de Foodie era el de Paso Fino pero llevaba a /foodie: el logo
+ *     de la casa no llevaba a la casa. Ahora el logo de la marca
+ *     lleva a su marca y el de Paso Fino, aquí arriba, a la raíz.
+ *  2. El salto entre líneas. Quien cae en Los Lirios desde un
+ *     anuncio ve que el mismo fabricante tiene una línea premium
+ *     —y al revés—. Para un distribuidor eso es el argumento de
+ *     «un solo proveedor, una sola factura».
+ *
+ *  No es sticky a propósito: se va con el scroll y deja pegada
+ *  sólo la cabecera de la marca. Dos barras fijas se comen la
+ *  pantalla en un teléfono.
+ */
+
+interface Props {
+  /** Marca en la que estamos, para marcarla como actual. */
+  marca?: string | null;
+}
+
+const { marca = null } = Astro.props;
+
+const lineas = listaMarcas().map((m) => ({
+  slug: m.slug,
+  nombre: m.nombre,
+  href: `/${m.slug}`,
+  actual: m.slug === marca,
+}));
+---
+
+<div class="barra">
+  <div class="barra__interior">
+    <a class="barra__casa" href="/" aria-label={`${SITE.nombreLegal} — inicio`}>
+      <Image
+        src={logoPasoFino}
+        alt={SITE.nombreLegal}
+        widths={[140, 280]}
+        sizes="110px"
+        loading="eager"
+      />
+      <span class="barra__casa-texto">Una marca de Corporación Paso Fino</span>
+    </a>
+
+    <nav class="barra__lineas" aria-label="Nuestras marcas">
+      <ul>
+        {
+          lineas.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                class:list={['barra__linea', { actual: l.actual }]}
+                aria-current={l.actual ? 'page' : undefined}
+              >
+                {l.nombre}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<style>
+  .barra {
+    background: var(--blanco);
+    color: var(--tinta);
+    border-bottom: 1px solid var(--gris-borde);
+  }
+
+  .barra__interior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    max-width: var(--ancho);
+    margin-inline: auto;
+    padding-inline: var(--margen);
+    min-height: 48px;
+  }
+
+  /* El relleno vertical va en los enlaces y no en la franja: así el
+     área que responde al toque ocupa todo el alto de la barra. Con el
+     relleno en el contenedor, en un teléfono había que acertarle a
+     una tira de 30 px. */
+  .barra__casa {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 0.55rem;
+    transition: opacity var(--transicion);
+  }
+
+  .barra__casa:hover {
+    opacity: 0.65;
+  }
+
+  .barra__casa :global(img) {
+    width: clamp(96px, 8vw, 124px);
+    height: auto;
+  }
+
+  /* La frase explica la relación entre la marca y la corporación,
+     que es justo lo que un comprador mayorista quiere saber. */
+  .barra__casa-texto {
+    font-family: var(--condensada);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--gris-medio);
+  }
+
+  .barra__lineas ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.85rem, 2vw, 1.75rem);
+  }
+
+  .barra__linea {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.6rem;
+    font-family: var(--condensada);
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gris-medio);
+    transition: color var(--transicion);
+  }
+
+  .barra__linea:hover {
+    color: var(--corp-verde);
+  }
+
+  /* La marca en la que ya estamos se muestra, pero apagada: sirve
+     de ubicación, no de invitación a hacer clic. */
+  .barra__linea.actual {
+    color: var(--tinta);
+  }
+
+  .barra__linea.actual::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0.45rem;
+    height: 2px;
+    background: var(--corp-verde);
+  }
+
+  @media (max-width: 720px) {
+    .barra__casa-texto {
+      display: none;
+    }
+    .barra__linea {
+      font-size: 0.95rem;
+    }
+  }
+</style>

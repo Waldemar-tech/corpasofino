@@ -4,7 +4,7 @@ import Icono from './Icono.astro';
 import logoPasoFino from '../assets/brand/logo-pasofino.png';
 import logoLirios from '../assets/brand/logo-los-lirios-rojo.png';
 import { NAV, REDES, SITE } from '../config/site.js';
-import { getMarca, navMarca } from '../config/marcas.js';
+import { getMarca, navMarca, listaMarcas } from '../config/marcas.js';
 import { enlaceWhatsApp } from '../lib/whatsapp.js';
 
 interface Props {
@@ -27,6 +27,12 @@ const logo = usaLogoPropio ? logoLirios : logoPasoFino;
 // existe, y en una casa de marcas es además lo correcto.
 const enlaces = m ? navMarca(marca!) : NAV;
 
+// En el menú móvil la barra corporativa queda arriba del todo y hay
+// que desplegar el menú para ver sus enlaces, así que la otra línea y
+// la vuelta a la casa se repiten aquí dentro. En escritorio no: ahí la
+// barra está siempre a la vista.
+const otraMarca = m ? listaMarcas().find((x) => x.slug !== marca) : null;
+
 const ruta = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 const activo = (href: string) =>
   href === '/' ? ruta === '/' : ruta === href || ruta.startsWith(href + '/');
@@ -42,19 +48,22 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
       class="cabecera__logo"
       aria-label={m ? `${m.nombre} — inicio` : `${SITE.nombreLegal} — inicio`}
     >
-      <Image
-        src={logo}
-        alt={usaLogoPropio ? m.nombre : SITE.nombreLegal}
-        widths={[220, 440]}
-        sizes="180px"
-        loading="eager"
-      />
       {
-        m && !usaLogoPropio && (
-          <span class="cabecera__submarca">
-            <span class="cabecera__submarca-sep" aria-hidden="true" />
-            {m.nombre}
-          </span>
+        usaLogoPropio || !m ? (
+          <Image
+            src={logo}
+            alt={usaLogoPropio ? m.nombre : SITE.nombreLegal}
+            widths={[220, 440]}
+            sizes="180px"
+            loading="eager"
+          />
+        ) : (
+          /* Foodie no tiene logotipo para cabecera —el óvalo verde no
+             se lee sobre fondo verde— así que va su nombre como
+             rótulo, en la tipografía de la marca. Antes iba el
+             logotipo de Paso Fino, pero desde que existe la barra
+             corporativa arriba salía dos veces en la misma pantalla. */
+          <span class="cabecera__rotulo">{m.nombre}</span>
         )
       }
     </a>
@@ -74,16 +83,10 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
             </li>
           ))
         }
-        {
-          m && (
-            <li>
-              <a href="/" class="cabecera__enlace cabecera__volver">
-                <Icono nombre="casa" tamano={16} trazo={2.2} />
-                Paso Fino
-              </a>
-            </li>
-          )
-        }
+        {/* El enlace de vuelta a Paso Fino vivía aquí, apagado y de
+            último en el menú. Ahora vive en la barra corporativa de
+            arriba, junto al logotipo de la casa; repetirlo sería
+            ruido y dos caminos para lo mismo. */}
       </ul>
     </nav>
 
@@ -142,6 +145,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
             </li>
           ))
         }
+        {m && <li><a href={`/${otraMarca.slug}`}>{otraMarca.nombre}</a></li>}
         {m && <li><a href="/">Paso Fino</a></li>}
         {!m && <li><a href="/contacto">Contacto</a></li>}
       </ul>
@@ -203,6 +207,17 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
   .cabecera__logo :global(img) {
     width: clamp(112px, 11vw, 150px);
     height: auto;
+  }
+
+  /* Rótulo de la marca cuando no tiene logotipo propio. */
+  .cabecera__rotulo {
+    font-family: var(--marca-display);
+    font-stretch: var(--marca-display-ancho);
+    font-size: clamp(1.9rem, 1.4rem + 1.5vw, 2.9rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   /* Marca de la línea, al lado del logo corporativo. */
