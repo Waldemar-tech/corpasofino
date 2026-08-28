@@ -1,0 +1,281 @@
+---
+/**
+ * Cabecera de las páginas corporativas de Paso Fino.
+ *
+ * Es distinta de la de las marcas a propósito: blanca, sobria y con
+ * el logotipo a color. Foodie tiene la suya verde con Anton, y Los
+ * Lirios tendrá la suya. Así funciona una casa de marcas — la
+ * corporación no compite visualmente con sus propias líneas.
+ */
+import { Image } from 'astro:assets';
+import Icono from './Icono.astro';
+import logo from '../assets/brand/logo-pasofino-color.png';
+import { NAV, REDES, SITE } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+const ruta = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const activo = (href: string) => {
+  if (href.startsWith('/#')) return false; // anclas del home: nunca "activas"
+  return href === '/' ? ruta === '/' : ruta === href || ruta.startsWith(href + '/');
+};
+
+const wa = enlaceWhatsApp('general');
+const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
+---
+
+<header class="corp">
+  <div class="corp__interior">
+    <a href="/" class="corp__logo" aria-label={`${SITE.nombreLegal} — inicio`}>
+      <Image
+        src={logo}
+        alt={`${SITE.nombreLegal} — RIF ${SITE.rif}`}
+        widths={[280, 560]}
+        sizes="240px"
+        loading="eager"
+      />
+    </a>
+
+    <nav class="corp__nav" aria-label="Navegación principal">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['corp__enlace', { activo: activo(item.href) }]}
+                aria-current={activo(item.href) ? 'page' : undefined}
+              >
+                {item.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="corp__redes">
+      {
+        tieneIg && (
+          <a
+            href={REDES.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
+            <Icono nombre="instagram" tamano={22} />
+          </a>
+        )
+      }
+      <a
+        href={wa}
+        data-wa="general"
+        data-wa-etiqueta="Header corporativo"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Escríbenos por WhatsApp"
+      >
+        <Icono nombre="whatsapp" tamano={22} />
+      </a>
+    </div>
+
+    <button
+      class="corp__hamburguesa"
+      type="button"
+      aria-expanded="false"
+      aria-controls="menu-corp"
+      aria-label="Abrir menú"
+    >
+      <Icono nombre="menu" tamano={26} />
+    </button>
+  </div>
+
+  <div class="corp__movil" id="menu-corp" hidden>
+    <nav aria-label="Navegación móvil">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href}>{item.texto}</a>
+            </li>
+          ))
+        }
+        <li><a href="/#distribuidores">¿Eres distribuidor?</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .corp {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--blanco);
+    border-bottom: 1px solid rgb(35 31 32 / 8%);
+  }
+
+  .corp__interior {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 3rem);
+    width: 100%;
+    max-width: var(--ancho);
+    margin-inline: auto;
+    padding: 0.85rem var(--margen);
+    min-height: 84px;
+  }
+
+  .corp__logo {
+    flex-shrink: 0;
+    display: block;
+    width: clamp(160px, 15vw, 230px);
+  }
+
+  .corp__logo :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .corp__nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .corp__nav ul {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 3.25rem);
+  }
+
+  .corp__enlace {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.4rem;
+    font-family: var(--texto);
+    font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.12rem);
+    font-weight: 400;
+    color: var(--tinta);
+    transition: color var(--transicion);
+  }
+
+  .corp__enlace::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--corp-verde);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transicion);
+  }
+
+  .corp__enlace:hover,
+  .corp__enlace.activo {
+    color: var(--corp-verde);
+  }
+
+  .corp__enlace:hover::after,
+  .corp__enlace.activo::after {
+    transform: scaleX(1);
+  }
+
+  .corp__redes {
+    display: flex;
+    gap: 0.65rem;
+    color: var(--corp-verde);
+  }
+
+  .corp__redes a {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    transition: opacity var(--transicion);
+  }
+
+  .corp__redes a:hover {
+    opacity: 0.65;
+  }
+
+  .corp__hamburguesa {
+    display: none;
+    color: var(--tinta);
+    padding: 0.25rem;
+  }
+
+  /* ── Móvil ──────────────────────────────────────────────── */
+  .corp__movil {
+    padding: 0 var(--margen) 1.5rem;
+    border-top: 1px solid rgb(35 31 32 / 8%);
+  }
+
+  .corp__movil[hidden] {
+    display: none;
+  }
+
+  .corp__movil ul {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .corp__movil a {
+    display: block;
+    padding: 1rem 0;
+    font-size: 1.2rem;
+    color: var(--tinta);
+    border-bottom: 1px solid rgb(35 31 32 / 8%);
+  }
+
+  @media (max-width: 900px) {
+    .corp__nav {
+      display: none;
+    }
+    .corp__hamburguesa {
+      display: block;
+    }
+    .corp__redes {
+      margin-left: auto;
+    }
+    .corp__interior {
+      min-height: 68px;
+    }
+  }
+
+  @media (min-width: 901px) {
+    .corp__movil {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const boton = document.querySelector<HTMLButtonElement>('.corp__hamburguesa');
+  const menu = document.getElementById('menu-corp');
+
+  if (boton && menu) {
+    const alternar = () => {
+      const abierto = boton.getAttribute('aria-expanded') === 'true';
+      boton.setAttribute('aria-expanded', String(!abierto));
+      boton.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+      menu.hidden = abierto;
+    };
+
+    boton.addEventListener('click', alternar);
+
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) {
+        boton.setAttribute('aria-expanded', 'false');
+        menu.hidden = true;
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) {
+        boton.setAttribute('aria-expanded', 'false');
+        menu.hidden = true;
+        boton.focus();
+      }
+    });
+  }
+</script>

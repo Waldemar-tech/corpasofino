@@ -28,6 +28,17 @@
 
   --ambar: #e6a633; /* lettering manuscrito, estrellas */
 
+  /* ── Corporativo Paso Fino ─────────────────────────────────
+     El sitio de la corporación tiene su propio registro visual,
+     más sobrio que el de Foodie: header y footer blancos, verdes
+     más saturados y un crema cálido para separar secciones.
+     Muestreado del PDF del home corporativo. */
+  --corp-verde: #01a85a; /* botones y enlaces */
+  --corp-verde-vivo: #18ae59; /* fondos de sección */
+  --corp-crema: #f9f6f2; /* franja de marcas */
+  --corp-negro: #1c1a1b; /* bloque de distribuidores */
+  --corp-negro-suave: #383536;
+
   /* ── Color de marca ────────────────────────────────────────
      Estas cinco variables las sobrescribe cada marca desde
      src/config/marcas.js. Por defecto valen lo de Paso Fino,

@@ -56,24 +56,33 @@ export const MARCAS = {
       'La línea de preparados de Corporación Paso Fino. Salsas de uso diario, pensadas para rendir en la cocina de casa y en la de un negocio.',
     descripcionCorta: 'Preparados y salsas de uso diario.',
 
-    // ⚠️ PALETA PROVISIONAL
-    // Derivada del verde corporativo Paso Fino hacia un rojo cálido,
-    // para que Los Lirios se distinga de Foodie sin salirse de la
-    // familia. NO es la identidad final: en cuanto el diseñador
-    // entregue logo y colores, se reemplazan estos cinco valores y
-    // toda la sección cambia sola.
+    // Paleta real, muestreada del logotipo que entregó la diseñadora
+    // en el PDF del home corporativo. Sustituye al rojo provisional
+    // que se había usado antes de tener assets de la marca.
     color: {
-      principal: '#B33A2B',
-      brillante: '#D14A36',
-      oscuro: '#8A2A1E',
-      titulo: '#8A2A1E',
-      acento: '#E6A633',
+      principal: '#593F27',
+      brillante: '#6E5034',
+      oscuro: '#3F2C1B',
+      titulo: '#593F27',
+      acento: '#C9A227',
     },
 
     tieneRecetas: false,
     tieneLettering: false,
-    paletaDefinitiva: false,
+    // El logotipo ya es definitivo; falta el diseño de sus páginas
+    // internas, que hoy usan la plantilla compartida.
+    paletaDefinitiva: true,
   },
+};
+
+/**
+ * Logotipos de cada marca, para el portafolio del home corporativo.
+ * Se importan desde los componentes que los usan (Astro necesita el
+ * import estático para poder optimizarlos en el build).
+ */
+export const LOGOS = {
+  foodie: 'logo-foodie.png',
+  'los-lirios': 'logo-los-lirios.png',
 };
 
 /** Orden en el que se muestran en el portafolio corporativo. */

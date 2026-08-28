@@ -1,0 +1,190 @@
+---
+/**
+ * Pie de las páginas corporativas: blanco, con el logotipo a color.
+ *
+ * Nota sobre el diseño original: el PDF traía en el pie
+ * «© 2026 Foodie Alimentos» y una columna de enlaces con PRODUCTOS y
+ * RECETAS, que son secciones de Foodie, no de la corporación. Se
+ * corrigió a Corporación Paso Fino y a la navegación corporativa —
+ * el pie de la casa madre no puede firmar como una de sus marcas.
+ */
+import { Image } from 'astro:assets';
+import Icono from './Icono.astro';
+import logo from '../assets/brand/logo-pasofino-color.png';
+import { SITE, CONTACTO, REDES, NAV_FOOTER } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+const anio = new Date().getFullYear();
+const wa = enlaceWhatsApp('general');
+const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
+const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
+---
+
+<footer class="pie">
+  <div class="pie__interior contenedor">
+    <div class="pie__marca">
+      <Image
+        src={logo}
+        alt={`${SITE.nombreLegal} — RIF ${SITE.rif}`}
+        widths={[300, 600]}
+        sizes="280px"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Dónde estamos</h2>
+      <p class="pie__texto">
+        {SITE.ciudad}, estado {SITE.estado}<br />Venezuela
+      </p>
+      <p class="pie__texto">{CONTACTO.horario}</p>
+    </div>
+
+    <nav class="pie__columna" aria-label="Navegación del pie de página">
+      <h2 class="pie__titulo">Secciones</h2>
+      <ul class="pie__enlaces">
+        {
+          NAV_FOOTER.map((item) => (
+            <li>
+              <a href={item.href}>{item.texto}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Síguenos</h2>
+      <div class="pie__redes">
+        {
+          tieneIg && (
+            <a href={REDES.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <Icono nombre="instagram" tamano={26} />
+            </a>
+          )
+        }
+        {
+          tieneTt && (
+            <a href={REDES.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <Icono nombre="tiktok" tamano={26} />
+            </a>
+          )
+        }
+        <a
+          href={wa}
+          data-wa="general"
+          data-wa-etiqueta="Footer corporativo"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="WhatsApp"
+        >
+          <Icono nombre="whatsapp" tamano={26} />
+        </a>
+      </div>
+
+      <p class="pie__copy">
+        © {anio} {SITE.nombreLegal}<br />Todos los derechos reservados.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    background: var(--blanco);
+    border-top: 1px solid rgb(35 31 32 / 8%);
+    padding-block: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .pie__interior {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .pie__marca :global(img) {
+    width: clamp(190px, 20vw, 280px);
+    height: auto;
+  }
+
+  .pie__titulo {
+    font-family: var(--texto);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--corp-verde);
+    margin-bottom: 1.1rem;
+  }
+
+  .pie__texto {
+    font-size: var(--t-sm);
+    line-height: 1.7;
+    color: var(--gris-medio);
+    margin-bottom: 0.75rem;
+  }
+
+  .pie__enlaces {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .pie__enlaces a {
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--corp-verde);
+    transition: color var(--transicion);
+  }
+
+  .pie__enlaces a:hover {
+    color: var(--tinta);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .pie__redes {
+    display: flex;
+    gap: 0.9rem;
+    color: var(--corp-verde);
+  }
+
+  .pie__redes a {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    transition:
+      background var(--transicion),
+      color var(--transicion);
+  }
+
+  .pie__redes a:hover {
+    background: var(--corp-verde);
+    color: var(--blanco);
+  }
+
+  .pie__copy {
+    margin-top: 1.75rem;
+    font-size: var(--t-xs);
+    line-height: 1.6;
+    color: var(--gris-suave);
+  }
+
+  @media (max-width: 900px) {
+    .pie__interior {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .pie__interior {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+    }
+  }
+</style>

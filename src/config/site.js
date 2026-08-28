@@ -113,12 +113,14 @@ export const ALIADOS = [];
  * habla como fabricante y las marcas son su portafolio.
  */
 export const NAV = [
-  { texto: 'Foodie', href: '/foodie' },
-  { texto: 'Los Lirios', href: '/los-lirios' },
+  { texto: 'Inicio', href: '/' },
+  { texto: 'Nuestras marcas', href: '/#marcas' },
   { texto: 'Nosotros', href: '/nosotros' },
+  { texto: 'Contacto', href: '/contacto' },
 ];
 
 export const NAV_FOOTER = [
+  { texto: 'Nuestras marcas', href: '/#marcas' },
   { texto: 'Foodie', href: '/foodie' },
   { texto: 'Los Lirios', href: '/los-lirios' },
   { texto: 'Nosotros', href: '/nosotros' },

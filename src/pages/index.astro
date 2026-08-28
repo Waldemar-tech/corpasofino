@@ -4,129 +4,231 @@ import { getCollection } from 'astro:content';
 
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
-import Distribuidores from '../components/Distribuidores.astro';
+import DistribuidoresFranja from '../components/DistribuidoresFranja.astro';
 
-import heroBurger from '../assets/ilustraciones/hero-hamburguesa.png';
-import mesaFamilia from '../assets/ilustraciones/mesa-familia.png';
+import logoFoodie from '../assets/brand/logo-foodie.png';
+import logoLirios from '../assets/brand/logo-los-lirios.png';
+import envases from '../assets/placeholder/envases-trio.png';
+
+import icVenezuela from '../assets/iconos-corp/venezuela.png';
+import icCaja from '../assets/iconos-corp/caja.png';
+import icMedalla from '../assets/iconos-corp/medalla.png';
+import icCultivo from '../assets/iconos-corp/cultivo.png';
+import icFabrica from '../assets/iconos-corp/fabrica.png';
+import icEmpaque from '../assets/iconos-corp/empaque.png';
+import icDespacho from '../assets/iconos-corp/despacho.png';
+import icCompra from '../assets/iconos-corp/compra.png';
+import icMesa from '../assets/iconos-corp/mesa.png';
+import icUbicacion from '../assets/iconos-corp/ubicacion.png';
 
 import { SITE } from '../config/site.js';
-import { listaMarcas } from '../config/marcas.js';
+import { getMarca } from '../config/marcas.js';
 import { negocioLocal } from '../lib/schema.js';
 
 /**
  * ─────────────────────────────────────────────────────────────
  *  HOME CORPORATIVO DE PASO FINO
  * ─────────────────────────────────────────────────────────────
- *
- *  Esta es la raíz del sitio y la página que más tráfico pagado va
- *  a recibir. Por eso NO es un selector de marcas bonito: es la
- *  página donde Paso Fino se presenta como fabricante y donde el
- *  bloque de distribuidores es el protagonista.
- *
- *  El argumento comercial central es que las dos líneas se venden
- *  juntas: un distribuidor cubre el segmento premium y el de uso
- *  diario con un solo proveedor, una factura y un despacho. Eso es
- *  más fuerte que vender cualquiera de las dos marcas por separado.
+ *  Maquetado a partir del PDF «Home - Paso Fino» de la diseñadora.
+ *  El copy del diseño venía en lorem ipsum salvo el bloque de
+ *  distribuidores, que sí traía texto final y se respetó tal cual
+ *  (corrigiendo «Llevano» → «Llévanos» y «cátalogo» → «catálogo»).
  */
 
-const marcas = listaMarcas();
 const productos = await getCollection('productos');
+const total = productos.length;
+const cuenta = (slug) => productos.filter((p) => p.data.marca === slug).length;
 
-const conteo = Object.fromEntries(
-  marcas.map((m) => [
-    m.slug,
-    productos.filter((p) => p.data.marca === m.slug).length,
-  ])
-);
-const totalReferencias = productos.length;
+// Orden tomado del diseño: Los Lirios arriba y sobre tarjeta blanca,
+// Foodie debajo directamente sobre el crema. No es alfabético ni por
+// importancia — es el ritmo visual que rompe la simetría del bloque.
+const marcas = [
+  { ...getMarca('los-lirios'), logo: logoLirios, conteo: cuenta('los-lirios') },
+  { ...getMarca('foodie'), logo: logoFoodie, conteo: cuenta('foodie') },
+];
+
+const sellos = [
+  {
+    icono: icVenezuela,
+    titulo: 'Hecho en Venezuela',
+    texto: `Planta propia en ${SITE.ciudad}, estado ${SITE.estado}.`,
+  },
+  {
+    icono: icCaja,
+    titulo: 'Un solo proveedor',
+    texto: `${total} referencias en dos líneas. Un pedido, una factura.`,
+  },
+  {
+    icono: icMedalla,
+    titulo: 'Calidad constante',
+    texto: 'La misma receta en cada lote, sin sorpresas para tu cliente.',
+  },
+];
+
+const proceso = [
+  { icono: icCultivo, texto: 'Materia prima' },
+  { icono: icFabrica, texto: 'Producción' },
+  { icono: icEmpaque, texto: 'Envasado' },
+  { icono: icDespacho, texto: 'Despacho' },
+  { icono: icCompra, texto: 'Punto de venta' },
+  { icono: icMesa, texto: 'Tu mesa' },
+];
 ---
 
 <Base
   titulo="Fábrica de salsas y aderezos en Barquisimeto"
-  descripcion={`${SITE.nombreLegal} fabrica salsas y aderezos en ${SITE.ciudad}, estado ${SITE.estado}. Dos líneas —Foodie y Los Lirios— y ${totalReferencias} referencias. Buscamos distribuidores en toda Venezuela.`}
+  descripcion={`${SITE.nombreLegal} fabrica salsas y aderezos en ${SITE.ciudad}, estado ${SITE.estado}. Dos marcas —Foodie y Los Lirios— y ${total} referencias. Buscamos distribuidores en toda Venezuela.`}
   jsonLd={negocioLocal()}
 >
   {/* ── HERO ─────────────────────────────────────────────── */}
   <section class="hero">
-    <div class="contenedor hero__grid">
-      <div class="hero__texto">
-        <p class="hero__antetitulo">Fabricante venezolano · RIF {SITE.rif}</p>
+    <div class="hero__fondo" aria-hidden="true">
+      <span class="hero__pendiente">Fotografía pendiente</span>
+    </div>
 
+    <div class="contenedor hero__interior">
+      <div class="hero__texto">
         <h1 class="hero__titulo">
           Fabricamos las salsas<br />de la mesa venezolana
         </h1>
 
         <p class="hero__intro">
-          Desde {SITE.ciudad}, estado {SITE.estado}, producimos dos líneas
-          de salsas y aderezos: <strong>Foodie</strong> para el segmento
-          premium y <strong>Los Lirios</strong> para el consumo diario.
-          {' '}{totalReferencias} referencias, una sola planta, un solo
-          proveedor.
+          Desde {SITE.ciudad} producimos dos líneas de salsas y aderezos:
+          <strong>Foodie</strong> para el segmento premium y
+          <strong>Los Lirios</strong> para el consumo diario. {total}
+          referencias, una sola planta, un solo proveedor.
         </p>
 
         <div class="hero__acciones">
-          <a href="#distribuidores" class="btn btn--blanco">
-            Quiero distribuir
-          </a>
-          <a href="#portafolio" class="btn hero__btn-fantasma">
-            Ver el portafolio
+          <a href="#marcas" class="cta cta--solido">
+            Conoce nuestras marcas
             <Icono nombre="flecha" tamano={18} />
+          </a>
+          <a href="#distribuidores" class="cta cta--contorno">
+            ¿Eres distribuidor?
           </a>
         </div>
       </div>
 
-      <div class="hero__imagen">
-        <Image
-          src={heroBurger}
-          alt="Plato servido con salsas de Corporación Paso Fino"
-          widths={[520, 860, 1200]}
-          sizes="(max-width: 900px) 88vw, 44vw"
-          loading="eager"
-          fetchpriority="high"
-        />
+      <p class="hero__origen">
+        <Image src={icUbicacion} alt="" widths={[40]} sizes="20px" loading="eager" />
+        Hecho en Venezuela <span aria-hidden="true">•</span> {SITE.ciudad}, {SITE.estado}
+      </p>
+    </div>
+  </section>
+
+  {/* ── NUESTRAS MARCAS ──────────────────────────────────── */}
+  <section class="marcas" id="marcas" aria-labelledby="marcas-titulo">
+    <div class="contenedor">
+      <h2 id="marcas-titulo" class="solo-lectores">Nuestras marcas</h2>
+
+      <div class="marcas__grid">
+        <div class="marcas__foto" aria-hidden="true">
+          <span class="marcas__pendiente">Fotografía pendiente</span>
+        </div>
+
+        <div class="marcas__lista">
+          {
+            marcas.map((m, i) => (
+              <article
+                class:list={['marca', { 'marca--tarjeta': i === 0 }]}
+                style={`--m-color: ${m.color.principal}`}
+              >
+                <div class="marca__info">
+                  <Image
+                    src={m.logo}
+                    alt={`Logotipo de ${m.nombre}`}
+                    widths={[220, 440]}
+                    sizes="200px"
+                    loading="lazy"
+                    class="marca__logo"
+                  />
+
+                  <p class="marca__texto">{m.descripcion}</p>
+
+                  <a href={`/${m.slug}`} class="marca__cta">
+                    Conocer {m.nombre}
+                    <Icono nombre="flecha" tamano={18} />
+                  </a>
+                </div>
+
+                <Image
+                  src={envases}
+                  alt=""
+                  widths={[280, 520]}
+                  sizes="240px"
+                  loading="lazy"
+                  class="marca__envases"
+                />
+              </article>
+            ))
+          }
+        </div>
       </div>
     </div>
   </section>
 
-  {/* ── PORTAFOLIO DE MARCAS ─────────────────────────────── */}
-  <section class="portafolio seccion" id="portafolio">
-    <div class="contenedor">
-      <div class="portafolio__cabeza">
-        <h2>Dos líneas, dos bolsillos</h2>
-        <p>
-          La misma planta y los mismos controles detrás de dos marcas que
-          le hablan a públicos distintos. Para un distribuidor eso
-          significa cubrir el anaquel completo sin sumar proveedores.
+  {/* ── POR QUÉ PASO FINO ────────────────────────────────── */}
+  <section class="confianza seccion" aria-labelledby="confianza-titulo">
+    <div class="contenedor confianza__grid">
+      <div>
+        <h2 id="confianza-titulo" class="confianza__titulo">
+          Una fábrica, no un intermediario
+        </h2>
+        <p class="confianza__texto">
+          {SITE.nombreLegal} produce lo que vende. No importamos ni
+          reetiquetamos: fabricamos acá, con la cadena de proveedores y
+          el empleo que eso implica. Es también la razón por la que
+          podemos sostener dos líneas de precio a la vez y responder a un
+          pedido sin depender de una aduana.
         </p>
+
+        <ul class="sellos">
+          {
+            sellos.map((s) => (
+              <li class="sello">
+                <Image
+                  src={s.icono}
+                  alt=""
+                  widths={[96, 192]}
+                  sizes="52px"
+                  loading="lazy"
+                  class="sello__icono"
+                />
+                <h3 class="sello__titulo">{s.titulo}</h3>
+                <p class="sello__texto">{s.texto}</p>
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
-      <ul class="portafolio__lista">
+      <div class="confianza__foto" aria-hidden="true">
+        <span class="marcas__pendiente">Fotografía pendiente</span>
+      </div>
+    </div>
+  </section>
+
+  {/* ── DE LA MATERIA PRIMA A TU MESA ────────────────────── */}
+  <section class="proceso" aria-labelledby="proceso-titulo">
+    <div class="contenedor">
+      <h2 id="proceso-titulo" class="proceso__titulo">
+        De la materia prima a tu mesa
+      </h2>
+
+      <ul class="proceso__lista">
         {
-          marcas.map((m) => (
-            <li>
-              <a
-                href={`/${m.slug}`}
-                class="marca-tarjeta"
-                style={`--mt-color: ${m.color.principal}; --mt-oscuro: ${m.color.oscuro}; --mt-acento: ${m.color.acento}`}
-              >
-                <div class="marca-tarjeta__cabeza">
-                  <p class="marca-tarjeta__etiqueta">{m.posicionamiento}</p>
-                  <h3 class="marca-tarjeta__nombre">{m.nombre}</h3>
-                </div>
-
-                <p class="marca-tarjeta__texto">{m.descripcion}</p>
-
-                <div class="marca-tarjeta__pie">
-                  <span class="marca-tarjeta__conteo">
-                    {conteo[m.slug]} referencias
-                    {m.tieneRecetas && ' · con recetario'}
-                  </span>
-                  <span class="marca-tarjeta__cta">
-                    Conocer {m.nombre}
-                    <Icono nombre="flecha" tamano={18} />
-                  </span>
-                </div>
-              </a>
+          proceso.map((p) => (
+            <li class="paso">
+              <Image
+                src={p.icono}
+                alt=""
+                widths={[110, 220]}
+                sizes="72px"
+                loading="lazy"
+                class="paso__icono"
+              />
+              <span class="paso__texto">{p.texto}</span>
             </li>
           ))
         }
@@ -134,280 +236,370 @@ const totalReferencias = productos.length;
     </div>
   </section>
 
-  {/* ── LA EMPRESA ───────────────────────────────────────── */}
-  <section class="empresa">
-    <div class="contenedor empresa__grid">
-      <div>
-        <h2>Hecho en Barquisimeto</h2>
-        <p class="empresa__texto">
-          {SITE.nombreLegal} es una empresa venezolana que fabrica lo que
-          vende. No importamos ni reetiquetamos: producimos acá, en el
-          estado {SITE.estado}, con la cadena de proveedores y el empleo
-          que eso implica.
-        </p>
-        <p class="empresa__texto">
-          Esa es también la razón por la que podemos sostener dos líneas
-          de precio a la vez y responder a un pedido sin depender de una
-          aduana.
-        </p>
-        <a href="/nosotros" class="empresa__enlace">
-          Conocer la empresa
-          <Icono nombre="flecha" tamano={16} />
-        </a>
-      </div>
-
-      <div class="empresa__ilustracion">
-        <Image
-          src={mesaFamilia}
-          alt="Ilustración de personas compartiendo comida en la mesa"
-          widths={[600, 1000, 1600]}
-          sizes="(max-width: 900px) 92vw, 50vw"
-          loading="lazy"
-        />
-      </div>
-    </div>
-  </section>
-
-  {/* ── DISTRIBUIDORES (B2B) — el objetivo del sitio ─────── */}
-  <Distribuidores />
+  {/* ── DISTRIBUIDORES (B2B) ─────────────────────────────── */}
+  <DistribuidoresFranja />
 </Base>
 
 <style>
-  /* ── Hero ─────────────────────────────────────────────── */
-  .hero {
-    background: var(--verde);
-    color: var(--blanco);
-    padding-block: clamp(2.5rem, 6vw, 5.5rem);
-    overflow: hidden;
+  /* ── Botones del corporativo ──────────────────────────── */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.6rem;
+    font-size: var(--t-base);
+    font-weight: 600;
+    transition:
+      background var(--transicion),
+      color var(--transicion),
+      transform var(--transicion);
   }
 
-  .hero__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: clamp(2rem, 5vw, 4rem);
+  .cta:hover {
+    transform: translateY(-2px);
+  }
+
+  .cta--solido {
+    color: var(--blanco);
+    background: var(--corp-verde);
+  }
+
+  .cta--solido:hover {
+    background: #018f4c;
+  }
+
+  .cta--contorno {
+    color: var(--corp-verde);
+    background: var(--blanco);
+    box-shadow: inset 0 0 0 2px var(--corp-verde);
+  }
+
+  .cta--contorno:hover {
+    background: var(--corp-verde);
+    color: var(--blanco);
+  }
+
+  /* ── Hero ─────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    background: var(--gris-fondo);
+    min-height: clamp(480px, 68vh, 760px);
+    display: flex;
     align-items: center;
   }
 
-  .hero__antetitulo {
-    font-family: var(--condensada);
-    font-size: var(--t-sm);
-    font-weight: 700;
-    letter-spacing: 0.16em;
+  /* Aquí va la fotografía de portada cuando el cliente la entregue:
+     basta sustituir este div por un <Image> a pantalla completa. */
+  .hero__fondo {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: end center;
+    padding-bottom: 1.25rem;
+  }
+
+  .hero__pendiente,
+  .marcas__pendiente {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ambar);
-    margin-bottom: 1rem;
+    color: var(--gris-borde);
+  }
+
+  /* La etiqueta del marcador de posición no debe estorbar la lectura
+     del titular: va al pie del bloque, no centrada sobre el texto. */
+  .hero__pendiente {
+    color: #d6d6da;
+  }
+
+  .hero__interior {
+    position: relative;
+    width: 100%;
+    padding-block: clamp(3rem, 8vw, 6rem);
   }
 
   .hero__titulo {
-    color: var(--blanco);
+    font-family: var(--texto);
+    font-size: clamp(2.4rem, 1.3rem + 4.6vw, 5rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-transform: none;
+    color: var(--tinta);
   }
 
   .hero__intro {
-    max-width: 50ch;
-    margin-top: 1.5rem;
+    max-width: 52ch;
+    margin-top: 1.75rem;
     font-size: var(--t-md);
     line-height: 1.65;
-    opacity: 0.94;
+    color: var(--gris-fuerte);
   }
 
   .hero__intro strong {
     font-weight: 700;
-    color: var(--blanco);
+    color: var(--tinta);
   }
 
   .hero__acciones {
     display: flex;
     flex-wrap: wrap;
     gap: 0.85rem;
-    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
 
-  .hero__btn-fantasma {
-    color: var(--blanco);
-    border-color: rgb(255 255 255 / 65%);
-  }
-
-  .hero__btn-fantasma:hover {
-    background: var(--blanco);
-    color: var(--verde);
-    border-color: var(--blanco);
-  }
-
-  .hero__imagen :global(img) {
-    width: 100%;
-    height: auto;
-  }
-
-  @media (max-width: 900px) {
-    .hero__grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .hero__imagen {
-      order: -1;
-      max-width: 420px;
-      margin-inline: auto;
-    }
-  }
-
-  /* ── Portafolio ───────────────────────────────────────── */
-  .portafolio__cabeza {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    gap: clamp(1.5rem, 4vw, 4rem);
-    align-items: start;
-  }
-
-  .portafolio__cabeza h2 {
-    color: var(--verde-titulo);
-  }
-
-  .portafolio__cabeza p {
-    max-width: 56ch;
-    font-size: var(--t-md);
-    line-height: 1.7;
+  .hero__origen {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: clamp(2.5rem, 6vw, 5rem);
+    font-size: var(--t-sm);
     color: var(--gris-medio);
   }
 
-  .portafolio__lista {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
-    gap: clamp(1.25rem, 2.5vw, 2rem);
-    margin-top: clamp(2.5rem, 5vw, 4rem);
+  .hero__origen :global(img) {
+    width: 20px;
+    height: auto;
   }
 
-  /* Cada tarjeta se pinta con el color de su propia marca —
-     así el portafolio se lee de un vistazo como dos cosas
-     distintas y no como dos enlaces iguales. */
-  .marca-tarjeta {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    height: 100%;
-    padding: clamp(1.75rem, 4vw, 2.75rem);
-    color: var(--blanco);
-    background: var(--mt-color);
-    border-radius: var(--radio-lg);
-    transition:
-      transform var(--transicion),
-      box-shadow var(--transicion);
-  }
-
-  .marca-tarjeta:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--sombra-alta);
-  }
-
-  .marca-tarjeta__etiqueta {
-    font-family: var(--condensada);
-    font-size: var(--t-sm);
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--mt-acento);
-    margin-bottom: 0.5rem;
-  }
-
-  .marca-tarjeta__nombre {
-    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.4rem);
-    color: var(--blanco);
-  }
-
-  .marca-tarjeta__texto {
-    flex: 1;
-    font-size: var(--t-base);
-    line-height: 1.65;
-    opacity: 0.92;
-  }
-
-  .marca-tarjeta__pie {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding-top: 1.25rem;
-    border-top: 1.5px solid rgb(255 255 255 / 30%);
-  }
-
-  .marca-tarjeta__conteo {
-    font-family: var(--condensada);
-    font-size: var(--t-sm);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    opacity: 0.85;
-  }
-
-  .marca-tarjeta__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-family: var(--condensada);
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 820px) {
-    .portafolio__cabeza {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1.25rem;
+  @media (min-width: 1100px) {
+    .hero__origen {
+      position: absolute;
+      right: var(--margen);
+      bottom: 0;
+      margin-top: 0;
     }
   }
 
-  /* ── La empresa ───────────────────────────────────────── */
-  .empresa {
-    background: var(--gris-fondo);
-    padding-block: var(--seccion);
+  /* ── Nuestras marcas ──────────────────────────────────── */
+  .marcas {
+    background: var(--corp-crema);
+    padding-block: clamp(2.5rem, 5vw, 4.5rem);
   }
 
-  .empresa__grid {
+  .marcas__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: stretch;
+  }
+
+  .marcas__foto {
+    display: grid;
+    place-items: center;
+    min-height: 420px;
+    background: #ececee;
+    border-radius: var(--radio-lg);
+  }
+
+  .marcas__lista {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .marca {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border-radius: var(--radio-lg);
+  }
+
+  /* En el diseño una de las dos marcas va sobre tarjeta blanca y la
+     otra directamente sobre el crema. Rompe la simetría a propósito
+     y evita que el bloque se lea como dos botones iguales. */
+  .marca--tarjeta {
+    background: var(--blanco);
+  }
+
+  .marca__logo {
+    width: clamp(150px, 16vw, 205px);
+    height: auto;
+  }
+
+  .marca__texto {
+    max-width: 42ch;
+    margin-top: 1.25rem;
+    font-size: var(--t-sm);
+    line-height: 1.65;
+    color: var(--m-color);
+  }
+
+  .marca__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 0.85rem 1.4rem;
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--blanco);
+    background: var(--m-color);
+    transition:
+      opacity var(--transicion),
+      transform var(--transicion);
+  }
+
+  .marca__cta:hover {
+    opacity: 0.88;
+    transform: translateY(-2px);
+  }
+
+  .marca__envases {
+    width: clamp(120px, 14vw, 190px);
+    height: auto;
+    align-self: end;
+  }
+
+  @media (max-width: 1024px) {
+    .marcas__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .marcas__foto {
+      min-height: 260px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .marca {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .marca__envases {
+      justify-self: end;
+      margin-top: -2rem;
+    }
+  }
+
+  /* ── Confianza ────────────────────────────────────────── */
+  .confianza__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     gap: clamp(2rem, 5vw, 4.5rem);
     align-items: center;
   }
 
-  .empresa__grid h2 {
-    color: var(--verde-titulo);
+  .confianza__titulo {
+    font-family: var(--texto);
+    font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    color: var(--tinta);
   }
 
-  .empresa__texto {
-    max-width: 50ch;
+  .confianza__texto {
+    max-width: 56ch;
     margin-top: 1.25rem;
-    font-size: var(--t-md);
+    font-size: var(--t-base);
     line-height: 1.7;
     color: var(--gris-medio);
   }
 
-  .empresa__enlace {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 1.75rem;
-    font-family: var(--condensada);
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--verde-titulo);
-    text-decoration: underline;
-    text-underline-offset: 5px;
+  .sellos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    gap: clamp(0.85rem, 2vw, 1.25rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
 
-  .empresa__enlace:hover {
+  .sello {
+    padding: clamp(1.1rem, 2.5vw, 1.6rem);
+    border: 1.5px solid var(--corp-verde);
+    border-radius: var(--radio-lg);
+  }
+
+  .sello__icono {
+    width: 52px;
+    height: auto;
+    margin-bottom: 1.1rem;
+  }
+
+  .sello__titulo {
+    font-family: var(--texto);
+    font-size: 1.02rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-transform: none;
     color: var(--tinta);
   }
 
-  .empresa__ilustracion :global(img) {
-    width: 100%;
+  .sello__texto {
+    margin-top: 0.45rem;
+    font-size: var(--t-xs);
+    line-height: 1.55;
+    color: var(--gris-medio);
+  }
+
+  .confianza__foto {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    background: var(--gris-fondo);
+  }
+
+  @media (max-width: 960px) {
+    .confianza__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .confianza__foto {
+      order: -1;
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  /* ── Proceso ──────────────────────────────────────────── */
+  .proceso {
+    padding-block: 0 var(--seccion);
+  }
+
+  .proceso__titulo {
+    font-family: var(--texto);
+    font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    text-align: center;
+    color: var(--tinta);
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .proceso__lista {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 2rem);
+  }
+
+  .paso {
+    display: grid;
+    justify-items: center;
+    gap: 0.9rem;
+    text-align: center;
+  }
+
+  .paso__icono {
+    width: clamp(48px, 6vw, 76px);
     height: auto;
   }
 
+  .paso__texto {
+    font-size: var(--t-xs);
+    color: var(--gris-medio);
+  }
+
   @media (max-width: 900px) {
-    .empresa__grid {
-      grid-template-columns: minmax(0, 1fr);
+    .proceso__lista {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 2rem;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .proceso__lista {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>

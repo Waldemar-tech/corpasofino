@@ -4,6 +4,8 @@ import Seo from '../components/Seo.astro';
 import Analytics from '../components/Analytics.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import HeaderCorporativo from '../components/HeaderCorporativo.astro';
+import FooterCorporativo from '../components/FooterCorporativo.astro';
 import Icono from '../components/Icono.astro';
 import { SITE, TRACKING } from '../config/site.js';
 import { variablesMarca } from '../config/marcas.js';
@@ -80,13 +82,17 @@ const wa = enlaceWhatsApp('general');
 
     <a href="#contenido" class="saltar">Saltar al contenido</a>
 
-    <Header marca={marca} />
+    {/* Cada marca trae su propia cabecera. Las páginas corporativas
+        usan la blanca de Paso Fino; dentro de una marca manda la suya.
+        No es un capricho estético: es lo que hace que el visitante
+        sepa siempre en qué parte de la casa está parado. */}
+    {marca ? <Header marca={marca} /> : <HeaderCorporativo />}
 
     <main id="contenido">
       <slot />
     </main>
 
-    <Footer />
+    {marca ? <Footer /> : <FooterCorporativo />}
 
     {
       !sinBotonFlotante && (

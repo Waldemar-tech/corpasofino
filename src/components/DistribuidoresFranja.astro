@@ -1,0 +1,156 @@
+---
+/**
+ * Bloque B2B en versión franja — el del home corporativo.
+ *
+ * Es la variante que trae el diseño de Paso Fino: fondo casi negro,
+ * la marca gráfica de agua al fondo y un solo CTA a WhatsApp. Más
+ * corta que la versión completa (`Distribuidores.astro`) que se usa
+ * dentro de las marcas, porque en la raíz ya viene precedida de todo
+ * el argumento de fabricante y no hace falta repetirlo.
+ *
+ * Comparte con la otra el mismo contrato de medición: los atributos
+ * `data-wa` son los que lee scripts/tracking.js para disparar el
+ * evento `Lead`, que es la conversión que se optimiza en la pauta.
+ */
+import { Image } from 'astro:assets';
+import Icono from './Icono.astro';
+import marcaGrafica from '../assets/brand/marca-grafica.png';
+import { SITE } from '../config/site.js';
+import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+const wa = enlaceWhatsApp('distribuidor');
+---
+
+<section class="franja" id="distribuidores" aria-labelledby="franja-titulo">
+  <div class="franja__agua" aria-hidden="true">
+    <Image src={marcaGrafica} alt="" widths={[420, 820]} sizes="640px" loading="lazy" />
+  </div>
+
+  <div class="contenedor franja__grid">
+    <div class="franja__cabeza">
+      <p class="franja__antetitulo">Mayoristas y distribuidores</p>
+      <h2 id="franja-titulo" class="franja__titulo">
+        Llévanos a tu<br />zona de venta
+      </h2>
+    </div>
+
+    <div class="franja__cuerpo">
+      <p class="franja__texto">
+        Buscamos distribuidores, supermercados y negocios que quieran
+        crecer junto a nosotros. Con nuestros productos en un solo
+        proveedor, producción nacional en {SITE.ciudad} y el respaldo
+        formal de {SITE.nombreLegal}, ofrecemos una solución práctica
+        para tu negocio con precios escalonados por volumen y mejores
+        condiciones a medida que creces.
+      </p>
+    </div>
+
+    <div class="franja__accion">
+      <a
+        class="franja__cta"
+        href={wa}
+        data-wa="distribuidor"
+        data-wa-etiqueta="Franja corporativa"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Icono nombre="whatsapp" tamano={22} />
+        Solicitar catálogo
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .franja {
+    position: relative;
+    overflow: hidden;
+    background: var(--corp-negro);
+    color: var(--blanco);
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+
+  /* Marca de agua: el aro del logotipo, apenas insinuado. */
+  .franja__agua {
+    position: absolute;
+    top: 50%;
+    right: -4%;
+    translate: 0 -50%;
+    width: clamp(320px, 42vw, 640px);
+    opacity: 0.07;
+    pointer-events: none;
+  }
+
+  .franja__agua :global(img) {
+    width: 100%;
+    height: auto;
+    filter: grayscale(1) brightness(2.4);
+  }
+
+  .franja__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) auto;
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+
+  .franja__antetitulo {
+    font-size: var(--t-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+
+  .franja__titulo {
+    font-family: var(--texto);
+    font-size: clamp(2rem, 1.3rem + 2.6vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    color: var(--blanco);
+  }
+
+  .franja__texto {
+    max-width: 62ch;
+    font-size: var(--t-base);
+    line-height: 1.7;
+    text-align: justify;
+    opacity: 0.92;
+  }
+
+  .franja__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.6rem;
+    font-size: var(--t-base);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--blanco);
+    background: var(--corp-verde);
+    transition:
+      background var(--transicion),
+      transform var(--transicion);
+  }
+
+  .franja__cta:hover {
+    background: #018f4c;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 1024px) {
+    .franja__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+    .franja__texto {
+      text-align: left;
+    }
+    .franja__accion {
+      margin-top: 0.5rem;
+    }
+  }
+</style>
