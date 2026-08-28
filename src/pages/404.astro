@@ -23,11 +23,15 @@ import ilus from '../assets/ilustraciones/hamburguesa-papas.png';
       <h1>Esta página se nos quemó</h1>
       <p class="e404__texto">
         La dirección que buscas no existe o cambió de sitio. Vuelve al
-        inicio o revisa el catálogo.
+        inicio o entra por una de nuestras dos líneas.
       </p>
+      {/* Ya no hay un catálogo único: el catálogo vive dentro de cada
+          marca, así que el 404 ofrece las dos puertas en vez de
+          mandar a una redirección. */}
       <div class="e404__acciones">
         <a href="/" class="btn btn--verde">Ir al inicio</a>
-        <a href="/productos" class="btn btn--contorno">Ver productos</a>
+        <a href="/los-lirios/productos" class="btn btn--contorno">Los Lirios</a>
+        <a href="/foodie/productos" class="btn btn--contorno">Foodie</a>
       </div>
     </div>
   </section>

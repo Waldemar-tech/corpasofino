@@ -92,7 +92,7 @@ const wa = enlaceWhatsApp('general');
       <slot />
     </main>
 
-    {marca ? <Footer /> : <FooterCorporativo />}
+    {marca ? <Footer marca={marca} /> : <FooterCorporativo />}
 
     {
       !sinBotonFlotante && (

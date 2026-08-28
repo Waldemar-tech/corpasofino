@@ -17,6 +17,10 @@ const slug = producto.id.split('/').pop();
 const href = `/${data.marca}/productos/${slug}`;
 const imagen = data.imagen ?? botella;
 const esPlaceholder = !data.imagen;
+// Mientras no haya foto, si diseño entregó el arte de la etiqueta la
+// montamos sobre la botella de relleno: se reconoce el producto y el
+// catálogo deja de ser una fila de siluetas grises.
+const etiqueta = esPlaceholder ? data.etiqueta : undefined;
 ---
 
 <article class="tarjeta">
@@ -24,12 +28,24 @@ const esPlaceholder = !data.imagen;
     <div class:list={['tarjeta__medio', { 'es-placeholder': esPlaceholder }]}>
       <Image
         src={imagen}
-        alt={data.imagenAlt ?? `${data.nombre} Foodie`}
+        alt={data.imagenAlt ?? data.nombre}
         widths={[240, 420, 640]}
         sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
         loading={prioridad ? 'eager' : 'lazy'}
         class="tarjeta__img"
       />
+      {
+        etiqueta && (
+          <Image
+            src={etiqueta}
+            alt=""
+            widths={[240, 460]}
+            sizes="200px"
+            loading={prioridad ? 'eager' : 'lazy'}
+            class="tarjeta__etiqueta"
+          />
+        )
+      }
       {esPlaceholder && <span class="tarjeta__aviso">Foto pendiente</span>}
     </div>
 
@@ -82,8 +98,21 @@ const esPlaceholder = !data.imagen;
     object-fit: contain;
   }
 
-  .es-placeholder :global(img) {
+  .es-placeholder :global(.tarjeta__img) {
     opacity: 0.55;
+  }
+
+  /* La etiqueta va nítida sobre la botella atenuada, a la altura donde
+     iría pegada en el envase real. */
+  .tarjeta__medio :global(.tarjeta__etiqueta) {
+    top: auto;
+    bottom: 16%;
+    left: 50%;
+    translate: -50% 0;
+    width: 74%;
+    height: auto;
+    padding: 0;
+    opacity: 1;
   }
 
   .tarjeta__aviso {

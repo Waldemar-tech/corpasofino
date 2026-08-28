@@ -1,9 +1,24 @@
 ---
 import { Image } from 'astro:assets';
 import Icono from './Icono.astro';
-import logo from '../assets/brand/logo-pasofino.png';
+import logoPasoFino from '../assets/brand/logo-pasofino.png';
+import logoLirios from '../assets/brand/logo-los-lirios-rojo.png';
 import { SITE, CONTACTO, REDES, NAV_FOOTER } from '../config/site.js';
+import { getMarca } from '../config/marcas.js';
 import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+interface Props {
+  /** Slug de la marca; null en páginas corporativas. */
+  marca?: string | null;
+}
+
+const { marca = null } = Astro.props;
+const m = marca ? getMarca(marca) : null;
+
+// Mismo criterio que en la cabecera: si la marca tiene logotipo
+// propio lo usa, y si no va el corporativo en blanco.
+const usaLogoPropio = m?.header?.logo === 'los-lirios';
+const logo = usaLogoPropio ? logoLirios : logoPasoFino;
 
 const anio = new Date().getFullYear();
 const wa = enlaceWhatsApp('general');
@@ -18,7 +33,7 @@ const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
           repite aquí debajo: aparecía dos veces en el pie. */}
       <Image
         src={logo}
-        alt={`${SITE.nombreLegal} — RIF ${SITE.rif}`}
+        alt={usaLogoPropio ? m.nombre : `${SITE.nombreLegal} — RIF ${SITE.rif}`}
         widths={[240, 480]}
         sizes="220px"
         loading="lazy"
@@ -95,8 +110,8 @@ const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
 
 <style>
   .pie {
-    background: var(--verde);
-    color: var(--blanco);
+    background: var(--marca-header-fondo);
+    color: var(--marca-header-texto);
     padding-block: clamp(2.5rem, 5vw, 4rem);
   }
 
@@ -167,8 +182,9 @@ const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
     place-items: center;
     width: 44px;
     height: 44px;
-    border: 1.5px solid rgb(255 255 255 / 55%);
+    border: 1.5px solid currentColor;
     border-radius: 50%;
+    opacity: 0.85;
     transition:
       background var(--transicion),
       color var(--transicion),
@@ -176,9 +192,10 @@ const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
   }
 
   .pie__redes a:hover {
-    background: var(--blanco);
-    color: var(--verde);
-    border-color: var(--blanco);
+    opacity: 1;
+    background: var(--marca-pastilla-fondo);
+    color: var(--marca-pastilla-texto);
+    border-color: var(--marca-pastilla-fondo);
   }
 
   .pie__copy {

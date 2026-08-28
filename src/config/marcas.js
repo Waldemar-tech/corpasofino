@@ -36,6 +36,23 @@ export const MARCAS = {
       oscuro: '#066A37',
       titulo: '#0F6B37',
       acento: '#E6A633',
+      claro: '#F2F2F4',
+    },
+
+    // Cabecera verde con el logotipo corporativo en blanco, tal como
+    // se diseñó: Foodie no tiene logotipo propio en el header.
+    header: {
+      fondo: '#138B47',
+      texto: '#FFFFFF',
+      logo: 'pasofino-blanco',
+      // Píldora del CTA de distribuidores: blanca sobre el verde.
+      pastillaFondo: '#FFFFFF',
+      pastillaTexto: '#138B47',
+    },
+
+    tipografia: {
+      display: "'Anton', 'Arial Narrow', sans-serif",
+      ancho: 'normal',
     },
 
     tieneRecetas: true,
@@ -56,21 +73,45 @@ export const MARCAS = {
       'La línea de preparados de Corporación Paso Fino. Salsas de uso diario, pensadas para rendir en la cocina de casa y en la de un negocio.',
     descripcionCorta: 'Preparados y salsas de uso diario.',
 
-    // Paleta real, muestreada del logotipo que entregó la diseñadora
-    // en el PDF del home corporativo. Sustituye al rojo provisional
-    // que se había usado antes de tener assets de la marca.
+    /**
+     * Paleta real, muestreada del PDF «Home - Los Lirios».
+     *
+     * OJO con la historia de este color: en el PDF corporativo el
+     * logotipo de Los Lirios aparecía en MARRÓN, y aquí en su propio
+     * PDF aparece en ROJO. Se resolvió a favor del rojo — el archivo
+     * de la marca manda sobre cómo la pinta otro documento — y hay
+     * que avisarle a la diseñadora de la inconsistencia.
+     */
     color: {
-      principal: '#593F27',
-      brillante: '#6E5034',
-      oscuro: '#3F2C1B',
-      titulo: '#593F27',
-      acento: '#C9A227',
+      principal: '#B72325', // rojo de marca
+      brillante: '#ED3324', // rojo vivo de las ondas
+      oscuro: '#61100B', // texto y fondos profundos
+      titulo: '#B72325',
+      acento: '#F1BF21', // amarillo de botones y gotas
+      claro: '#F5E9DF', // crema de fondo
+    },
+
+    // Cabecera crema con el logotipo propio de la marca. A diferencia
+    // de Foodie, Los Lirios sí tiene logotipo y lo usa en el header.
+    header: {
+      fondo: '#F5E9DF',
+      texto: '#61100B',
+      logo: 'los-lirios',
+      // Sobre el crema una píldora blanca desaparecería: va roja.
+      pastillaFondo: '#B72325',
+      pastillaTexto: '#FFFFFF',
+    },
+
+    // Fredoka es variable y trae eje de ancho: el diseño usa la
+    // versión condensada, que se consigue con font-stretch en vez de
+    // cargar una familia aparte.
+    tipografia: {
+      display: "'Fredoka Variable', 'Trebuchet MS', sans-serif",
+      ancho: '82%',
     },
 
     tieneRecetas: false,
     tieneLettering: false,
-    // El logotipo ya es definitivo; falta el diseño de sus páginas
-    // internas, que hoy usan la plantilla compartida.
     paletaDefinitiva: true,
   },
 };
@@ -106,6 +147,13 @@ export function variablesMarca(slug) {
     `--marca-oscuro: ${m.color.oscuro}`,
     `--marca-titulo: ${m.color.titulo}`,
     `--marca-acento: ${m.color.acento}`,
+    `--marca-claro: ${m.color.claro}`,
+    `--marca-header-fondo: ${m.header.fondo}`,
+    `--marca-header-texto: ${m.header.texto}`,
+    `--marca-pastilla-fondo: ${m.header.pastillaFondo}`,
+    `--marca-pastilla-texto: ${m.header.pastillaTexto}`,
+    `--marca-display: ${m.tipografia.display}`,
+    `--marca-display-ancho: ${m.tipografia.ancho}`,
   ].join('; ');
 }
 

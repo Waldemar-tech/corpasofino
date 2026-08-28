@@ -83,7 +83,23 @@ const esPlaceholder = !data.imagen;
             sizes="(max-width: 900px) 90vw, 46vw"
             loading="eager"
             fetchpriority="high"
+            class="ficha__img"
           />
+          {/* Igual que en el catálogo: mientras no haya foto, la
+              etiqueta que entregó diseño se monta sobre el envase de
+              relleno para que se reconozca el producto. */}
+          {
+            esPlaceholder && data.etiqueta && (
+              <Image
+                src={data.etiqueta}
+                alt=""
+                widths={[340, 640]}
+                sizes="320px"
+                loading="eager"
+                class="ficha__etiqueta"
+              />
+            )
+          }
           {
             esPlaceholder && (
               <span class="ficha__aviso">Fotografía pendiente</span>
@@ -225,8 +241,19 @@ const esPlaceholder = !data.imagen;
     object-fit: contain;
   }
 
-  .es-placeholder :global(img) {
+  .es-placeholder :global(.ficha__img) {
     opacity: 0.5;
+  }
+
+  .ficha__medio :global(.ficha__etiqueta) {
+    top: auto;
+    bottom: 31%;
+    left: 50%;
+    translate: -50% 0;
+    width: min(44%, 280px);
+    height: auto;
+    padding: 0;
+    opacity: 1;
   }
 
   .ficha__aviso {

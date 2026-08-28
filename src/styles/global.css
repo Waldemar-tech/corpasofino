@@ -17,6 +17,9 @@
 @import '@fontsource/barlow-condensed/latin-700-italic.css';
 @import '@fontsource-variable/dm-sans/wght.css';
 @import '@fontsource-variable/dm-sans/wght-italic.css';
+/* Los Lirios: Fredoka (variable, con eje de ancho) y Lilita One. */
+@import '@fontsource-variable/fredoka/standard.css';
+@import '@fontsource/lilita-one/latin-400.css';
 
 :root {
   /* ── Color ─────────────────────────────────────────────────── */
@@ -48,6 +51,13 @@
   --marca-oscuro: var(--verde-oscuro);
   --marca-titulo: var(--verde-titulo);
   --marca-acento: var(--ambar);
+  --marca-claro: var(--gris-fondo);
+  --marca-header-fondo: var(--verde);
+  --marca-header-texto: #ffffff;
+  --marca-pastilla-fondo: #ffffff;
+  --marca-pastilla-texto: var(--verde);
+  --marca-display: var(--display);
+  --marca-display-ancho: normal;
 
   --tinta: #231f20; /* texto principal */
   --gris-fuerte: #373435;

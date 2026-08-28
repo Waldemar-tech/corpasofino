@@ -30,6 +30,11 @@ const productos = defineCollection({
       informacionNutricional: z.string().optional(),
       imagen: image().optional(),
       imagenAlt: z.string().optional(),
+      /** Arte de la etiqueta del envase, tal como la entrega diseño.
+          No es una foto del producto: se monta sobre la botella de
+          relleno para que el catálogo no se vea vacío mientras llegan
+          las fotos reales. Si hay `imagen`, manda la foto. */
+      etiqueta: image().optional(),
       destacado: z.boolean().default(false),
       /** Se muestra en el SEO como meta description si está presente. */
       metaDescripcion: z.string().max(160).optional(),

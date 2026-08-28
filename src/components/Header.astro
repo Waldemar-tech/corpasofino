@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import Icono from './Icono.astro';
-import logo from '../assets/brand/logo-pasofino.png';
+import logoPasoFino from '../assets/brand/logo-pasofino.png';
+import logoLirios from '../assets/brand/logo-los-lirios-rojo.png';
 import { NAV, REDES, SITE } from '../config/site.js';
 import { getMarca, navMarca } from '../config/marcas.js';
 import { enlaceWhatsApp } from '../lib/whatsapp.js';
@@ -13,6 +14,12 @@ interface Props {
 
 const { marca = null } = Astro.props;
 const m = marca ? getMarca(marca) : null;
+
+// Los Lirios tiene logotipo propio y lo usa en su cabecera. Foodie no
+// tiene uno para el header, así que ahí va el corporativo en blanco
+// acompañado del nombre de la línea.
+const usaLogoPropio = m?.header?.logo === 'los-lirios';
+const logo = usaLogoPropio ? logoLirios : logoPasoFino;
 
 // En la raíz manda Paso Fino y las marcas son el menú. Dentro de una
 // marca, el menú es el de esa marca y aparece el camino de vuelta a
@@ -37,13 +44,13 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     >
       <Image
         src={logo}
-        alt={SITE.nombreLegal}
+        alt={usaLogoPropio ? m.nombre : SITE.nombreLegal}
         widths={[220, 440]}
         sizes="180px"
         loading="eager"
       />
       {
-        m && (
+        m && !usaLogoPropio && (
           <span class="cabecera__submarca">
             <span class="cabecera__submarca-sep" aria-hidden="true" />
             {m.nombre}
@@ -165,14 +172,14 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
 </header>
 
 <style>
-  /* El fondo lo pone la marca activa; en corporativo, --marca vale
-     el verde de Paso Fino por defecto (ver global.css). */
+  /* Fondo y color de texto los pone la marca activa: Foodie va en
+     verde con texto blanco, Los Lirios en crema con texto vino. */
   .cabecera {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--marca);
-    color: var(--blanco);
+    background: var(--marca-header-fondo);
+    color: var(--marca-header-texto);
   }
 
   .cabecera__interior {
@@ -203,7 +210,8 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    font-family: var(--display);
+    font-family: var(--marca-display);
+    font-stretch: var(--marca-display-ancho);
     font-size: clamp(1.05rem, 0.9rem + 0.5vw, 1.5rem);
     letter-spacing: 0.01em;
     text-transform: uppercase;
@@ -214,7 +222,8 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     display: block;
     width: 1.5px;
     height: 2em;
-    background: rgb(255 255 255 / 45%);
+    background: currentColor;
+    opacity: 0.45;
   }
 
   .cabecera__nav {
@@ -288,8 +297,8 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: var(--marca);
-    background: var(--blanco);
+    color: var(--marca-pastilla-texto);
+    background: var(--marca-pastilla-fondo);
     border-radius: var(--radio-pill);
     white-space: nowrap;
     transition:
@@ -299,7 +308,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
 
   .cabecera__distribuidores:hover {
     background: var(--marca-acento);
-    color: var(--tinta);
+    color: var(--marca-oscuro);
   }
 
   .cabecera__redes {
@@ -312,8 +321,9 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     place-items: center;
     width: 36px;
     height: 36px;
-    border: 1.5px solid rgb(255 255 255 / 55%);
+    border: 1.5px solid currentColor;
     border-radius: 9px;
+    opacity: 0.8;
     transition:
       background var(--transicion),
       border-color var(--transicion),
@@ -321,9 +331,10 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
   }
 
   .cabecera__red:hover {
-    background: var(--blanco);
-    border-color: var(--blanco);
-    color: var(--marca);
+    opacity: 1;
+    background: var(--marca-pastilla-fondo);
+    border-color: var(--marca-pastilla-fondo);
+    color: var(--marca-pastilla-texto);
   }
 
   .cabecera__hamburguesa {
@@ -335,7 +346,8 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
   /* ── Menú móvil ─────────────────────────────────────────── */
   .movil {
     padding: 0 var(--margen) 2rem;
-    border-top: 1px solid rgb(255 255 255 / 20%);
+    border-top: 1px solid currentColor;
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
   }
 
   .movil[hidden] {
@@ -354,7 +366,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     font-size: 1.5rem;
     font-weight: 600;
     text-transform: uppercase;
-    border-bottom: 1px solid rgb(255 255 255 / 15%);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
   }
 
   .movil__cta {

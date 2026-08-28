@@ -56,6 +56,23 @@ handle /recetas* {
 	redir * /foodie{uri} permanent
 }
 
+# El catálogo de Los Lirios se publicó primero con cinco productos
+# hipotéticos, puestos para poder maquetar. Al llegar la línea real
+# (etiquetas de la diseñadora incluidas) cambiaron los nombres, y con
+# ellos las URLs. Las viejas alcanzaron a estar en el sitemap, así que
+# se redirigen en vez de dejarlas caer en 404:
+#   mayonesa        → preparado-mayonesa
+#   mostaza         → salsa-a-base-de-mostaza
+#   salsa-de-tomate → salsa-a-base-de-tomate
+# «salsa-de-ajo» y «salsa-rosada» no tienen equivalente —esos productos
+# no existen en la línea— así que van al catálogo, que es la respuesta
+# honesta: el producto no está, aquí está lo que sí hay.
+redir /los-lirios/productos/mayonesa /los-lirios/productos/preparado-mayonesa permanent
+redir /los-lirios/productos/mostaza /los-lirios/productos/salsa-a-base-de-mostaza permanent
+redir /los-lirios/productos/salsa-de-tomate /los-lirios/productos/salsa-a-base-de-tomate permanent
+redir /los-lirios/productos/salsa-de-ajo /los-lirios/productos permanent
+redir /los-lirios/productos/salsa-rosada /los-lirios/productos permanent
+
 # Los archivos de /_astro/ llevan hash en el nombre: si cambia el
 # contenido, cambia la URL. Se cachean para siempre sin riesgo.
 handle /_astro/* {
