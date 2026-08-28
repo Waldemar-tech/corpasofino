@@ -6,6 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icono from '../components/Icono.astro';
 import { SITE, TRACKING } from '../config/site.js';
+import { variablesMarca } from '../config/marcas.js';
 import { enlaceWhatsApp } from '../lib/whatsapp.js';
 import { organizacion, sitioWeb } from '../lib/schema.js';
 
@@ -19,6 +20,9 @@ interface Props {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   /** Oculta el botón flotante (p. ej. en la página de contacto) */
   sinBotonFlotante?: boolean;
+  /** Slug de marca ('foodie' | 'los-lirios'). Null = páginas
+      corporativas de Paso Fino. Pinta el sitio con su identidad. */
+  marca?: string | null;
 }
 
 const {
@@ -30,7 +34,13 @@ const {
   noindex,
   jsonLd = [],
   sinBotonFlotante = false,
+  marca = null,
 } = Astro.props;
+
+// Las variables de color de la marca se inyectan en <body>, así toda
+// la página (header, botones, titulares) hereda la identidad correcta
+// sin necesidad de una hoja de estilos por marca.
+const estiloMarca = marca ? variablesMarca(marca) : undefined;
 
 // La identidad de la empresa viaja en todas las páginas; lo específico
 // de cada página se le suma encima.
@@ -58,7 +68,7 @@ const wa = enlaceWhatsApp('general');
     <Analytics />
   </head>
 
-  <body>
+  <body style={estiloMarca} data-marca={marca ?? 'corporativo'}>
     {
       TRACKING.gtmId && (
         <noscript
@@ -70,7 +80,7 @@ const wa = enlaceWhatsApp('general');
 
     <a href="#contenido" class="saltar">Saltar al contenido</a>
 
-    <Header />
+    <Header marca={marca} />
 
     <main id="contenido">
       <slot />

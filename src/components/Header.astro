@@ -3,33 +3,59 @@ import { Image } from 'astro:assets';
 import Icono from './Icono.astro';
 import logo from '../assets/brand/logo-pasofino.png';
 import { NAV, REDES, SITE } from '../config/site.js';
+import { getMarca, navMarca } from '../config/marcas.js';
 import { enlaceWhatsApp } from '../lib/whatsapp.js';
 
-const ruta = Astro.url.pathname.replace(/\/$/, '') || '/';
+interface Props {
+  /** Slug de la marca en la que estamos, o null en páginas corporativas. */
+  marca?: string | null;
+}
+
+const { marca = null } = Astro.props;
+const m = marca ? getMarca(marca) : null;
+
+// En la raíz manda Paso Fino y las marcas son el menú. Dentro de una
+// marca, el menú es el de esa marca y aparece el camino de vuelta a
+// la corporación. El logo es siempre el de Paso Fino: es el único que
+// existe, y en una casa de marcas es además lo correcto.
+const enlaces = m ? navMarca(marca!) : NAV;
+
+const ruta = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 const activo = (href: string) =>
-  href === '/' ? ruta === '/' : ruta.startsWith(href);
+  href === '/' ? ruta === '/' : ruta === href || ruta.startsWith(href + '/');
 
 const wa = enlaceWhatsApp('general');
 const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
 ---
 
-<header class="cabecera">
+<header class="cabecera" data-marca={marca ?? 'corporativo'}>
   <div class="cabecera__interior">
-    <a href="/" class="cabecera__logo" aria-label={`${SITE.nombreLegal} — inicio`}>
+    <a
+      href={m ? `/${m.slug}` : '/'}
+      class="cabecera__logo"
+      aria-label={m ? `${m.nombre} — inicio` : `${SITE.nombreLegal} — inicio`}
+    >
       <Image
         src={logo}
         alt={SITE.nombreLegal}
         widths={[220, 440]}
         sizes="180px"
         loading="eager"
-        densities={undefined}
       />
+      {
+        m && (
+          <span class="cabecera__submarca">
+            <span class="cabecera__submarca-sep" aria-hidden="true" />
+            {m.nombre}
+          </span>
+        )
+      }
     </a>
 
     <nav class="cabecera__nav" aria-label="Navegación principal">
       <ul>
         {
-          NAV.map((item) => (
+          enlaces.map((item) => (
             <li>
               <a
                 href={item.href}
@@ -40,6 +66,16 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
               </a>
             </li>
           ))
+        }
+        {
+          m && (
+            <li>
+              <a href="/" class="cabecera__enlace cabecera__volver">
+                <Icono nombre="casa" tamano={16} trazo={2.2} />
+                Paso Fino
+              </a>
+            </li>
+          )
         }
       </ul>
     </nav>
@@ -57,7 +93,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
               class="cabecera__red"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Instagram de Foodie"
+              aria-label="Instagram"
             >
               <Icono nombre="instagram" tamano={20} />
             </a>
@@ -67,7 +103,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
           href={wa}
           class="cabecera__red"
           data-wa="general"
-          data-wa-etiqueta="Header"
+          data-wa-etiqueta={m ? `Header ${m.nombre}` : 'Header corporativo'}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Escríbenos por WhatsApp"
@@ -93,13 +129,14 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     <nav aria-label="Navegación móvil">
       <ul>
         {
-          NAV.map((item) => (
+          enlaces.map((item) => (
             <li>
               <a href={item.href}>{item.texto}</a>
             </li>
           ))
         }
-        <li><a href="/contacto">Contacto</a></li>
+        {m && <li><a href="/">Paso Fino</a></li>}
+        {!m && <li><a href="/contacto">Contacto</a></li>}
       </ul>
     </nav>
     <a href="/#distribuidores" class="btn btn--blanco movil__cta">
@@ -128,11 +165,13 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
 </header>
 
 <style>
+  /* El fondo lo pone la marca activa; en corporativo, --marca vale
+     el verde de Paso Fino por defecto (ver global.css). */
   .cabecera {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--verde);
+    background: var(--marca);
     color: var(--blanco);
   }
 
@@ -149,13 +188,33 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
 
   .cabecera__logo {
     flex-shrink: 0;
-    display: block;
-    width: clamp(120px, 12vw, 168px);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
   }
 
   .cabecera__logo :global(img) {
-    width: 100%;
+    width: clamp(112px, 11vw, 150px);
     height: auto;
+  }
+
+  /* Marca de la línea, al lado del logo corporativo. */
+  .cabecera__submarca {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-family: var(--display);
+    font-size: clamp(1.05rem, 0.9rem + 0.5vw, 1.5rem);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .cabecera__submarca-sep {
+    display: block;
+    width: 1.5px;
+    height: 2em;
+    background: rgb(255 255 255 / 45%);
   }
 
   .cabecera__nav {
@@ -164,7 +223,8 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
 
   .cabecera__nav ul {
     display: flex;
-    gap: clamp(1.25rem, 3vw, 3.25rem);
+    align-items: center;
+    gap: clamp(1rem, 2.5vw, 2.75rem);
   }
 
   .cabecera__enlace {
@@ -201,6 +261,19 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     font-weight: 700;
   }
 
+  /* El camino de vuelta a la corporación: presente pero discreto. */
+  .cabecera__volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.05rem;
+    opacity: 0.75;
+  }
+
+  .cabecera__volver:hover {
+    opacity: 1;
+  }
+
   .cabecera__acciones {
     display: flex;
     align-items: center;
@@ -215,7 +288,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: var(--verde);
+    color: var(--marca);
     background: var(--blanco);
     border-radius: var(--radio-pill);
     white-space: nowrap;
@@ -225,7 +298,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
   }
 
   .cabecera__distribuidores:hover {
-    background: var(--ambar);
+    background: var(--marca-acento);
     color: var(--tinta);
   }
 
@@ -250,7 +323,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
   .cabecera__red:hover {
     background: var(--blanco);
     border-color: var(--blanco);
-    color: var(--verde);
+    color: var(--marca);
   }
 
   .cabecera__hamburguesa {
@@ -300,7 +373,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     border: none;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1100px) {
     .cabecera__nav,
     .cabecera__distribuidores {
       display: none;
@@ -313,7 +386,7 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
     }
   }
 
-  @media (min-width: 1025px) {
+  @media (min-width: 1101px) {
     .movil {
       display: none !important;
     }
@@ -332,7 +405,6 @@ const tieneIg = !REDES.instagram.includes('REEMPLAZAR');
       menu.hidden = abierto;
     });
 
-    // Cerrar al navegar a un ancla dentro de la misma página.
     menu.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).closest('a')) {
         boton.setAttribute('aria-expanded', 'false');

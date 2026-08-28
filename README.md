@@ -5,6 +5,51 @@ en el cliente, y se despliega en Railway detrás de Caddy.
 
 ---
 
+## Arquitectura: casa de marcas
+
+Paso Fino es la corporación. De ella cuelgan dos líneas de producto que
+le hablan a públicos y bolsillos distintos:
+
+```
+corpasofino.com/                          → Paso Fino (corporativo + distribuidores)
+corpasofino.com/foodie                    → Foodie · línea premium
+corpasofino.com/foodie/productos          → 7 referencias
+corpasofino.com/foodie/productos/ketchup
+corpasofino.com/foodie/recetas            → 6 recetas
+corpasofino.com/los-lirios                → Los Lirios · preparados de uso diario
+corpasofino.com/los-lirios/productos      → 5 referencias
+corpasofino.com/nosotros
+corpasofino.com/contacto
+corpasofino.com/politica-de-privacidad
+```
+
+**La raíz no es un selector de marcas.** Es la página que más tráfico
+pagado va a recibir, así que es donde Paso Fino se presenta como
+fabricante y donde el bloque de distribuidores es el protagonista. El
+argumento comercial central es que las dos líneas se venden juntas: un
+distribuidor cubre el segmento premium y el de uso diario con un solo
+proveedor, una factura y un despacho.
+
+### Cómo se agrega una marca nueva
+
+1. Una entrada en `src/config/marcas.js` (nombre, colores, si tiene
+   recetario).
+2. Una carpeta `src/contenido/productos/<slug>/` con sus `.md`.
+3. Un `src/pages/<slug>/index.astro` para su home.
+
+Las páginas de catálogo y de ficha ya son compartidas: viven en
+`src/pages/[marca]/` y se pintan con la identidad que toque leyendo la
+configuración. No hay que duplicar plantillas.
+
+### Redirecciones de la estructura vieja
+
+Antes de tener dos marcas, el catálogo vivía en `/productos` y
+`/recetas`. El `Caddyfile` redirige esas rutas con **301** hacia
+`/foodie/...`, para que ningún enlace ya compartido dé 404 y para que
+Google traspase la autoridad a la URL nueva.
+
+---
+
 ## Antes de publicar — pendientes obligatorios
 
 Estos datos no los tengo y el sitio los necesita. Todos están en un
@@ -25,9 +70,29 @@ que lo usa simplemente no se muestra.** El sitio nunca publica un
 enlace roto ni un script vacío. Esto es a propósito: es preferible que
 falte una sección a que un comprador haga clic en un WhatsApp muerto.
 
+### Pendientes de Los Lirios
+
+- **Identidad visual.** La paleta actual de Los Lirios es
+  **provisional**: un rojo cálido derivado del verde corporativo, para
+  que se distinga de Foodie sin salirse de la familia. Está declarada
+  en `src/config/marcas.js`. Cuando el diseñador entregue logo y
+  colores, se cambian esos cinco valores y toda la sección se repinta
+  sola — la estructura no hay que tocarla.
+- **Logotipo propio.** Hoy la sección usa el logo de Paso Fino con el
+  nombre de la línea al lado, que es lo correcto en una casa de marcas
+  y lo único posible sin assets propios.
+- **Catálogo por confirmar.** Cargué cinco referencias razonables para
+  una línea de preparados (salsa de tomate, mayonesa, mostaza, salsa de
+  ajo y salsa rosada). **Hay que confirmarlas con el cliente**: son una
+  hipótesis, no un dato. Están en `src/contenido/productos/los-lirios/`.
+- **Recetario.** Los Lirios no tiene sección de recetas
+  (`tieneRecetas: false` en `marcas.js`). Si más adelante la quiere,
+  se cambia a `true` y se agregan los `.md` en
+  `src/contenido/recetas/los-lirios/`.
+
 ### Otros pendientes de contenido
 
-- **Fotos de producto.** Los siete productos muestran una silueta gris
+- **Fotos de producto.** Los doce productos muestran una silueta gris
   con la etiqueta «Foto pendiente». Al colocar la foto real en
   `src/assets/productos/` y referenciarla en el `.md` del producto, la
   etiqueta desaparece sola.
@@ -208,9 +273,18 @@ latencia baja muchísimo. Cinco minutos de configuración.
 ### Verificar después del primer despliegue
 
 ```bash
-curl -I https://corpasofino.com/productos/ketchup   # 200, sin redirección
-curl -I https://corpasofino.com/no-existe           # 404
-curl -s https://corpasofino.com/sitemap-index.xml   # XML válido
+# Rutas nuevas: 200 sin redirección
+curl -I https://corpasofino.com/foodie/productos/ketchup
+curl -I https://corpasofino.com/los-lirios/productos/salsa-rosada
+
+# Rutas viejas: 301 hacia /foodie/...
+curl -I https://corpasofino.com/productos/ketchup
+
+# 404 propio
+curl -I https://corpasofino.com/no-existe
+
+# Sitemap
+curl -s https://corpasofino.com/sitemap-index.xml
 ```
 
 Y en el navegador, pega el enlace en un chat de WhatsApp: debe aparecer
@@ -231,26 +305,43 @@ la tarjeta con la imagen verde de la hamburguesa.
 
 ```
 src/
-  config/site.js          ← ÚNICO archivo a editar para datos del negocio
+  config/
+    site.js               ← datos del negocio (WhatsApp, IDs de pauta, dominio)
+    marcas.js             ← identidad de cada línea (colores, copy, secciones)
   contenido/
-    productos/*.md        ← 7 productos
-    recetas/*.md          ← 6 recetas
+    productos/foodie/*.md         ← 7 referencias
+    productos/los-lirios/*.md     ← 5 referencias
+    recetas/foodie/*.md           ← 6 recetas
   assets/                 ← imágenes originales (Astro las optimiza en el build)
   components/
     Seo.astro             ← meta tags, Open Graph, JSON-LD
     Analytics.astro       ← Meta Pixel + GTM
-    Distribuidores.astro  ← bloque B2B (se reutiliza en 4 páginas)
+    Distribuidores.astro  ← bloque B2B (se reutiliza en 6 páginas)
     Header / Footer / Tarjeta* / Migas / Icono
-  layouts/Base.astro
+  layouts/Base.astro      ← recibe `marca` y pinta el sitio con su paleta
   lib/
     schema.js             ← constructores de JSON-LD
     whatsapp.js           ← enlaces con mensaje precargado
+    rutas.js              ← helpers de URL por marca
   scripts/tracking.js     ← atribución UTM + eventos de conversión
   styles/global.css       ← tokens del diseño (colores, tipografías, escala)
   pages/
-Caddyfile                 ← servidor de producción
+    index.astro           ← Paso Fino corporativo
+    foodie/index.astro
+    los-lirios/index.astro
+    [marca]/productos/    ← catálogo y ficha, compartidos por ambas marcas
+    [marca]/recetas/      ← sólo se generan para marcas con recetario
+Caddyfile                 ← servidor de producción + redirecciones 301
 Dockerfile                ← build para Railway
 ```
+
+### Una trampa de Astro que conviene conocer
+
+`getStaticPaths` se **iza** fuera del frontmatter: sólo ve los imports
+del archivo, no las constantes declaradas junto a ella. Por eso el
+helper `slugDe` vive en `src/lib/rutas.js` y se importa, en vez de
+definirse arriba en cada página. Si lo defines local, el build falla
+con «slugDe is not defined».
 
 ---
 

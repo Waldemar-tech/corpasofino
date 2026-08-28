@@ -107,17 +107,25 @@ export function migas(items) {
   };
 }
 
-/** Ficha de producto. */
-export function producto(p, urlRelativa) {
+/**
+ * Ficha de producto.
+ *
+ * `nombreMarca` es Foodie o Los Lirios — la línea a la que pertenece.
+ * Va como `brand` y no como fabricante: para Google, la marca es la
+ * línea comercial y el fabricante es Paso Fino. Separarlo bien es lo
+ * que permite que las dos líneas coexistan sin canibalizarse en los
+ * resultados.
+ */
+export function producto(p, urlRelativa, nombreMarca = SITE.marca) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: `${p.nombre} ${SITE.marca}`,
+    name: `${p.nombre} ${nombreMarca}`,
     description: p.descripcionCorta,
     sku: p.sku ?? undefined,
     url: abs(urlRelativa),
     image: p.imagenOg ? [abs(p.imagenOg)] : undefined,
-    brand: { '@type': 'Brand', name: SITE.marca },
+    brand: { '@type': 'Brand', name: nombreMarca },
     manufacturer: { '@id': `${SITE.url}/#organizacion` },
     category: p.categoria ?? 'Salsas y aderezos',
   };

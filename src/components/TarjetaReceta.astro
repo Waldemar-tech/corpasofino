@@ -11,7 +11,8 @@ interface Props {
 
 const { receta, variante = 'clara', prioridad = false } = Astro.props;
 const { data } = receta;
-const href = `/recetas/${receta.id}`;
+const slug = receta.id.split('/').pop();
+const href = `/${data.marca}/recetas/${slug}`;
 const total = data.tiempoPreparacion + data.tiempoCoccion;
 ---
 

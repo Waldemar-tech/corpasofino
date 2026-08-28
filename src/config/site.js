@@ -108,17 +108,21 @@ export const TRACKING = {
  */
 export const ALIADOS = [];
 
-/** Navegación principal — la misma en header y footer. */
+/**
+ * Navegación corporativa — la de la raíz del sitio, donde Paso Fino
+ * habla como fabricante y las marcas son su portafolio.
+ */
 export const NAV = [
-  { texto: 'Productos', href: '/productos' },
-  { texto: 'Recetas', href: '/recetas' },
+  { texto: 'Foodie', href: '/foodie' },
+  { texto: 'Los Lirios', href: '/los-lirios' },
   { texto: 'Nosotros', href: '/nosotros' },
 ];
 
 export const NAV_FOOTER = [
-  { texto: 'Productos', href: '/productos' },
-  { texto: 'Recetas', href: '/recetas' },
+  { texto: 'Foodie', href: '/foodie' },
+  { texto: 'Los Lirios', href: '/los-lirios' },
   { texto: 'Nosotros', href: '/nosotros' },
   { texto: 'Contacto', href: '/contacto' },
+  { texto: 'Distribuidores', href: '/#distribuidores' },
   { texto: 'Política de privacidad', href: '/politica-de-privacidad' },
 ];

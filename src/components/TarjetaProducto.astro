@@ -11,7 +11,10 @@ interface Props {
 
 const { producto, prioridad = false } = Astro.props;
 const { data } = producto;
-const href = `/productos/${producto.id}`;
+// El id de la colección viene como "foodie/ketchup"; la URL se arma
+// con la marca declarada en el frontmatter y el nombre del archivo.
+const slug = producto.id.split('/').pop();
+const href = `/${data.marca}/productos/${slug}`;
 const imagen = data.imagen ?? botella;
 const esPlaceholder = !data.imagen;
 ---

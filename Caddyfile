@@ -1,17 +1,13 @@
-{
-	# Deshabilitar TLS: Railway maneja HTTPS en el proxy
-	auto_https off
-}
-
-# Escuchar en el puerto inyectado por Railway (default 8080)
+# Railway define PORT en tiempo de ejecución. En local, 8080.
 :{$PORT:8080}
 
 root * /srv
 
-# Comprime todo
+# Comprime todo lo que se pueda. Con conexiones móviles lentas esto
+# se nota más que cualquier micro-optimización del código.
 encode zstd gzip
 
-# Cabeceras de seguridad
+# Cabeceras de seguridad: aplican a todas las respuestas.
 header {
 	X-Content-Type-Options "nosniff"
 	Referrer-Policy "strict-origin-when-cross-origin"
@@ -21,28 +17,70 @@ header {
 	-Server
 }
 
-# Assets de /_astro/ (con hash)
-@astro path /_astro/*
-handle @astro {
+# Archivos servidos desde /public (favicons, imágenes OG, manifest).
+@estaticos path *.png *.jpg *.jpeg *.webp *.avif *.svg *.woff2 *.woff *.ico
+
+# ── Caché ───────────────────────────────────────────────────────
+# Se usan bloques handle y no varias directivas header porque los
+# handle son mutuamente excluyentes: entra al primero que coincide
+# y ya. Con directivas header sueltas, Caddy las anida y el orden
+# efectivo no es el que uno escribe — resultado: todo terminaba con
+# la misma cabecera de caché.
+
+# ── Redirecciones de la estructura vieja ───────────────────────
+# Antes el sitio era sólo de Foodie y el catálogo vivía en /productos
+# y /recetas. Al pasar a casa de marcas (Paso Fino en la raíz, cada
+# línea en su carpeta), esas rutas se mudaron bajo /foodie.
+#
+# Van con 301 (permanent) y no con 302: le dice a Google que la mudanza
+# es definitiva y le traspasa a la URL nueva la autoridad que la vieja
+# hubiera acumulado. Con 302 se quedaría indexando la vieja.
+#
+# Esto va ARRIBA de todo: si quedara debajo del file_server, Caddy
+# serviría un 404 antes de llegar a redirigir.
+handle /productos* {
+	# El `*` es obligatorio aquí: la sintaxis es
+	# `redir [<matcher>] <destino> [<código>]`, y Caddy toma como
+	# matcher cualquier primer token que empiece por «/». Sin el `*`,
+	# lee «/foodie{uri}» como filtro de ruta en vez de como destino,
+	# y devuelve un 200 vacío en lugar de redirigir.
+	redir * /foodie{uri} permanent
+}
+
+handle /recetas* {
+	# El `*` es obligatorio aquí: la sintaxis es
+	# `redir [<matcher>] <destino> [<código>]`, y Caddy toma como
+	# matcher cualquier primer token que empiece por «/». Sin el `*`,
+	# lee «/foodie{uri}» como filtro de ruta en vez de como destino,
+	# y devuelve un 200 vacío en lugar de redirigir.
+	redir * /foodie{uri} permanent
+}
+
+# Los archivos de /_astro/ llevan hash en el nombre: si cambia el
+# contenido, cambia la URL. Se cachean para siempre sin riesgo.
+handle /_astro/* {
 	header Cache-Control "public, max-age=31536000, immutable"
 	file_server
 }
 
-# Assets estáticos
-@static path *.png *.jpg *.jpeg *.webp *.avif *.svg *.woff2 *.woff *.ico
-handle @static {
+# Íconos, imágenes OG y fuentes sueltas de /public: un mes.
+handle @estaticos {
 	header Cache-Control "public, max-age=2592000"
 	file_server
 }
 
-# HTML con revalidación
+# Todo lo demás es HTML (y robots/sitemap): se revalida siempre, para
+# que un cambio de texto o de precio se vea de inmediato.
 handle {
 	header Cache-Control "public, max-age=0, must-revalidate"
+
+	# El build de Astro genera /productos/ketchup.html; esto lo sirve
+	# en /productos/ketchup sin redirección de por medio.
 	try_files {path} {path}.html {path}/index.html
 	file_server
 }
 
-# 404
+# ── Página 404 propia ───────────────────────────────────────────
 handle_errors {
 	@notfound expression {err.status_code} == 404
 	handle @notfound {

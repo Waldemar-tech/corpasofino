@@ -28,6 +28,16 @@
 
   --ambar: #e6a633; /* lettering manuscrito, estrellas */
 
+  /* ── Color de marca ────────────────────────────────────────
+     Estas cinco variables las sobrescribe cada marca desde
+     src/config/marcas.js. Por defecto valen lo de Paso Fino,
+     que es lo correcto para las páginas corporativas. */
+  --marca: var(--verde);
+  --marca-brillante: var(--verde-brillante);
+  --marca-oscuro: var(--verde-oscuro);
+  --marca-titulo: var(--verde-titulo);
+  --marca-acento: var(--ambar);
+
   --tinta: #231f20; /* texto principal */
   --gris-fuerte: #373435;
   --gris-medio: #6d6e71; /* texto secundario */

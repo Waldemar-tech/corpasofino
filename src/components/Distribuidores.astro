@@ -16,19 +16,41 @@
  *  Venezuela el canal comercial B2B se mueve por ahí. El
  *  formulario queda de respaldo para quien escribe fuera de hora.
  */
+import { getCollection } from 'astro:content';
 import Icono from './Icono.astro';
 import { CONTACTO, FORMULARIO, SITE } from '../config/site.js';
+import { listaMarcas, getMarca } from '../config/marcas.js';
 import { enlaceWhatsApp } from '../lib/whatsapp.js';
+
+interface Props {
+  /** Marca desde la que se muestra el bloque. Null = corporativo. */
+  marca?: string | null;
+}
+
+const { marca = null } = Astro.props;
+const marcaActual = marca ? getMarca(marca) : null;
+
+// El titular nombra lo que el visitante estaba viendo. En la raíz
+// habla de las dos líneas; dentro de una marca, de esa marca. Decirle
+// "lleva Foodie" a alguien que venía navegando Los Lirios es la clase
+// de detalle que hace que una página se sienta genérica.
+const queLlevar = marcaActual ? marcaActual.nombre : 'nuestras marcas';
 
 const wa = enlaceWhatsApp('distribuidor');
 const hayFormulario = Boolean(FORMULARIO.claveAcceso);
 const hayCorreo = !CONTACTO.emailVentas.includes('REEMPLAZAR');
 
+// El conteo se calcula del catálogo real, no se escribe a mano: al
+// agregar un producto nuevo, la promesa comercial se actualiza sola.
+const totalReferencias = (await getCollection('productos')).length;
+const nombresMarcas = listaMarcas()
+  .map((m) => m.nombre)
+  .join(' y ');
+
 const ventajas = [
   {
-    titulo: 'Siete referencias, un solo proveedor',
-    texto:
-      'Ketchup, mayonesa, mostaza, salsa de ajo, inglesa, soya y vinagre. Un pedido, una factura, un despacho.',
+    titulo: 'Dos líneas, un solo proveedor',
+    texto: `${nombresMarcas}: ${totalReferencias} referencias que cubren el segmento premium y el de uso diario. Un pedido, una factura, un despacho.`,
   },
   {
     titulo: 'Producción nacional',
@@ -52,7 +74,7 @@ const ventajas = [
       <p class="distri__antetitulo">Para mayoristas y distribuidores</p>
 
       <h2 id="distri-titulo" class="distri__titulo">
-        Lleva Foodie a tu<br />zona de venta
+        Lleva {queLlevar} a tu<br />zona de venta
       </h2>
 
       <p class="distri__intro">

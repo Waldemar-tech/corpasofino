@@ -14,14 +14,15 @@ const tieneTt = !REDES.tiktok.includes('REEMPLAZAR');
 <footer class="pie">
   <div class="pie__interior contenedor">
     <div class="pie__marca">
+      {/* El propio logotipo ya trae el RIF impreso, así que no se
+          repite aquí debajo: aparecía dos veces en el pie. */}
       <Image
         src={logo}
-        alt={SITE.nombreLegal}
+        alt={`${SITE.nombreLegal} — RIF ${SITE.rif}`}
         widths={[240, 480]}
         sizes="220px"
         loading="lazy"
       />
-      <p class="pie__rif">RIF.: {SITE.rif}</p>
     </div>
 
     <div class="pie__columna">

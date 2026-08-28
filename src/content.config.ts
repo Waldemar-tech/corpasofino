@@ -14,6 +14,8 @@ const productos = defineCollection({
   schema: ({ image }) =>
     z.object({
       nombre: z.string(),
+      /** A qué línea pertenece. Define la URL y la identidad visual. */
+      marca: z.enum(['foodie', 'los-lirios']),
       /** Orden en el listado. Menor número = aparece primero. */
       orden: z.number().default(99),
       descripcionCorta: z.string().max(180),
@@ -39,6 +41,9 @@ const recetas = defineCollection({
   schema: ({ image }) =>
     z.object({
       titulo: z.string(),
+      /** Hoy sólo Foodie tiene recetario; el campo deja la puerta
+          abierta a que Los Lirios tenga el suyo más adelante. */
+      marca: z.enum(['foodie', 'los-lirios']).default('foodie'),
       orden: z.number().default(99),
       descripcion: z.string(),
       /** Minutos. Alimentan el schema Recipe de Google. */
